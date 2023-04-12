@@ -8,18 +8,20 @@ import java.util.Date;
 import java.util.Objects;
 
 @Entity
-@Table(name = "estado")
+@Table(name = "produto")
 @Getter
 @Setter
 @ToString
 @RequiredArgsConstructor
-public class Estado {
+public class Produto {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    private String nome;
-    private String sigla;
+    private String descricaoCurta;
+    private String descricaoDetalhada;
+    private Double valorCusto;
+    private Double valorVenda;
 
     @Temporal(TemporalType.TIMESTAMP)
     private Date dataCriacao;
@@ -27,12 +29,21 @@ public class Estado {
     @Temporal(TemporalType.TIMESTAMP)
     private Date dataAtualizacao;
 
+    // Uma marca pode ter muitos produtos
+    @ManyToOne
+    @JoinColumn(name = "idMarca")
+    private Marca marca;
+
+    @ManyToOne
+    @JoinColumn(name = "idCategoria")
+    private Categoria categoria;
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
-        Estado estado = (Estado) o;
-        return getId() != null && Objects.equals(getId(), estado.getId());
+        Produto produto = (Produto) o;
+        return getId() != null && Objects.equals(getId(), produto.getId());
     }
 
     @Override

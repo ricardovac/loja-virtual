@@ -8,18 +8,17 @@ import java.util.Date;
 import java.util.Objects;
 
 @Entity
-@Table(name = "estado")
+@Table(name = "marca")
 @Getter
 @Setter
 @ToString
 @RequiredArgsConstructor
-public class Estado {
+public class Marca {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
     private String nome;
-    private String sigla;
 
     @Temporal(TemporalType.TIMESTAMP)
     private Date dataCriacao;
@@ -31,8 +30,8 @@ public class Estado {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
-        Estado estado = (Estado) o;
-        return getId() != null && Objects.equals(getId(), estado.getId());
+        Marca marca = (Marca) o;
+        return getId() != null && Objects.equals(getId(), marca.getId());
     }
 
     @Override

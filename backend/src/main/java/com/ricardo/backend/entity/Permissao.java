@@ -1,25 +1,25 @@
 package com.ricardo.backend.entity;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 import org.hibernate.Hibernate;
 
 import java.util.Date;
 import java.util.Objects;
 
 @Entity
-@Table(name = "estado")
+@Table(name = "permissao")
 @Getter
 @Setter
 @ToString
-@RequiredArgsConstructor
-public class Estado {
+public class Permissao {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
     private String nome;
-    private String sigla;
 
     @Temporal(TemporalType.TIMESTAMP)
     private Date dataCriacao;
@@ -31,8 +31,8 @@ public class Estado {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
-        Estado estado = (Estado) o;
-        return getId() != null && Objects.equals(getId(), estado.getId());
+        Pessoa pessoa = (Pessoa) o;
+        return getId() != null && Objects.equals(getId(), pessoa.getId());
     }
 
     @Override
