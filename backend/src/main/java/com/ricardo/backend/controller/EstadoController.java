@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/estados")
+@RequestMapping("/api/estado")
 public class EstadoController {
     @Autowired
     private EstadoService estadoService;

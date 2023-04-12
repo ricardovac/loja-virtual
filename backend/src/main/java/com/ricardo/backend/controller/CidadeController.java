@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/cidades")
+@RequestMapping("/api/cidade")
 public class CidadeController {
     @Autowired
     private CidadeService cidadeService;

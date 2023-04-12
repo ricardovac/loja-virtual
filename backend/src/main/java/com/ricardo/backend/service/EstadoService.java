@@ -24,7 +24,13 @@ public class EstadoService {
     }
 
     public Estado alterarEstado(Estado estado) {
-        estado.setDataAtualizacao(new Date());
+        Optional<Estado> estadoExistente = estadoRepository.findById(estado.getId());
+        if (estadoExistente.isPresent()) {
+            estado.setDataCriacao(estadoExistente.get().getDataCriacao()); // Mantém a data de criação existente
+        } else {
+            estado.setDataCriacao(new Date()); // Define uma nova data de criação
+        }
+        estado.setDataAtualizacao(new Date()); // Define a nova data de atualização
         return estadoRepository.saveAndFlush(estado);
     }
 
