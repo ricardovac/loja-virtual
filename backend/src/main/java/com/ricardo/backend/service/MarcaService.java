@@ -24,7 +24,13 @@ public class MarcaService {
     }
 
     public Marca alterarMarca(Marca marca) {
-        marca.setDataAtualizacao(new Date());
+        Optional<Marca> marcaExistente = marcaRepository.findById(marca.getId());
+        if (marcaExistente.isPresent()) {
+            marca.setDataCriacao(marcaExistente.get().getDataCriacao()); // Mantém a data de criação existente
+        } else {
+            marca.setDataCriacao(new Date()); // Define uma nova data de criação
+        }
+        marca.setDataAtualizacao(new Date()); // Define a nova data de atualização
         return marcaRepository.saveAndFlush(marca);
     }
 

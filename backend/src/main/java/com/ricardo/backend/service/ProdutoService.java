@@ -24,7 +24,13 @@ public class ProdutoService {
     }
 
     public Produto alterarProduto(Produto produto) {
-        produto.setDataAtualizacao(new Date());
+        Optional<Produto> produtoExistente = produtoRepository.findById(produto.getId());
+        if (produtoExistente.isPresent()) {
+            produto.setDataCriacao(produtoExistente.get().getDataCriacao()); // Mantém a data de criação existente
+        } else {
+            produto.setDataCriacao(new Date()); // Define uma nova data de criação
+        }
+        produto.setDataAtualizacao(new Date()); // Define a nova data de atualização
         return produtoRepository.saveAndFlush(produto);
     }
 

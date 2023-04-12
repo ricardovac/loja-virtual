@@ -24,7 +24,13 @@ public class PermissaoService {
     }
 
     public Permissao alterarPermissao(Permissao permissao) {
-        permissao.setDataAtualizacao(new Date());
+        Optional<Permissao> permissaoExistente = permissaoRepository.findById(permissao.getId());
+        if (permissaoExistente.isPresent()) {
+            permissao.setDataCriacao(permissaoExistente.get().getDataCriacao()); // Mantém a data de criação existente
+        } else {
+            permissao.setDataCriacao(new Date()); // Define uma nova data de criação
+        }
+        permissao.setDataAtualizacao(new Date()); // Define a nova data de atualização
         return permissaoRepository.saveAndFlush(permissao);
     }
 

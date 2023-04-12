@@ -24,7 +24,13 @@ public class CategoriaService {
     }
 
     public Categoria alterarCategoria(Categoria categoria) {
-        categoria.setDataAtualizacao(new Date());
+        Optional<Categoria> categoriaExistente = categoriaRepository.findById(categoria.getId());
+        if (categoriaExistente.isPresent()) {
+            categoria.setDataCriacao(categoriaExistente.get().getDataCriacao()); // Mantém a data de criação existente
+        } else {
+            categoria.setDataCriacao(new Date()); // Define uma nova data de criação
+        }
+        categoria.setDataAtualizacao(new Date()); // Define a nova data de atualização
         return categoriaRepository.saveAndFlush(categoria);
     }
 

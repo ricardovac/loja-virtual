@@ -24,7 +24,13 @@ public class PessoaService {
     }
 
     public Pessoa alterarPessoa(Pessoa pessoa) {
-        pessoa.setDataAtualizacao(new Date());
+        Optional<Pessoa> pessoaExistente = pessoaRepository.findById(pessoa.getId());
+        if (pessoaExistente.isPresent()) {
+            pessoa.setDataCriacao(pessoaExistente.get().getDataCriacao()); // Mantém a data de criação existente
+        } else {
+            pessoa.setDataCriacao(new Date()); // Define uma nova data de criação
+        }
+        pessoa.setDataAtualizacao(new Date()); // Define a nova data de atualização
         return pessoaRepository.saveAndFlush(pessoa);
     }
 

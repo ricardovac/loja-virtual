@@ -25,7 +25,13 @@ public class CidadeService {
     }
 
     public Cidade alterarCidade(Cidade cidade) {
-        cidade.setDataAtualizacao(new Date());
+        Optional<Cidade> cidadeExistente = cidadeRepository.findById(cidade.getId());
+        if (cidadeExistente.isPresent()) {
+            cidade.setDataCriacao(cidadeExistente.get().getDataCriacao()); // Mantém a data de criação existente
+        } else {
+            cidade.setDataCriacao(new Date()); // Define uma nova data de criação
+        }
+        cidade.setDataAtualizacao(new Date()); // Define a nova data de atualização
         return cidadeRepository.saveAndFlush(cidade);
     }
 
