@@ -20,12 +20,12 @@ public class PessoaController {
     }
 
     @PostMapping("/")
-    public Pessoa inserir(Pessoa pessoa) {
+    public Pessoa inserir(@RequestBody Pessoa pessoa) {
         return pessoaService.inserirPessoa(pessoa);
     }
 
     @PutMapping("/")
-    public Pessoa alterar(Pessoa pessoa) {
+    public Pessoa alterar(@RequestBody Pessoa pessoa) {
         return pessoaService.alterarPessoa(pessoa);
     }
 

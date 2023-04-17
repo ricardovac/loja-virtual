@@ -1,5 +1,6 @@
 package com.ricardo.backend.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -11,17 +12,24 @@ import java.util.Date;
 import java.util.Objects;
 
 @Entity
-@Table(name = "permissao")
+@Table(name = "permissao_pessoa")
 @Getter
 @Setter
 @ToString
 @RequiredArgsConstructor
-public class Permissao {
+public class PermissaoPessoa {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    private String nome;
+    @ManyToOne
+    @JoinColumn(name = "idPessoa")
+    @JsonIgnore
+    private Pessoa pessoa;
+
+    @ManyToOne
+    @JoinColumn(name = "idPermissao")
+    private Permissao permissao;
 
     @Temporal(TemporalType.TIMESTAMP)
     private Date dataCriacao;
@@ -33,8 +41,8 @@ public class Permissao {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
-        Permissao permissao = (Permissao) o;
-        return getId() != null && Objects.equals(getId(), permissao.getId());
+        PermissaoPessoa that = (PermissaoPessoa) o;
+        return getId() != null && Objects.equals(getId(), that.getId());
     }
 
     @Override

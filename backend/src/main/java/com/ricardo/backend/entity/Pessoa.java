@@ -1,13 +1,11 @@
 package com.ricardo.backend.entity;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import org.hibernate.Hibernate;
-import org.springframework.lang.NonNull;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Objects;
 
 @Entity
@@ -15,6 +13,7 @@ import java.util.Objects;
 @Getter
 @Setter
 @ToString
+@RequiredArgsConstructor
 public class Pessoa {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -22,16 +21,18 @@ public class Pessoa {
 
     private String nome;
     private String cpf;
-
-    @NotNull
-    @Email
-    @Column(name = "email", unique = true, nullable = false)
     private String email;
-
-    @NonNull
-    @Column(name = "senha", nullable = false)
     private String senha;
     private String endereco;
+
+    @ManyToOne
+    @JoinColumn(name = "idCidade")
+    private Cidade cidade;
+
+    @OneToMany(mappedBy = "pessoa", orphanRemoval = true, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @Setter(value = AccessLevel.NONE)
+    @ToString.Exclude
+    private List<PermissaoPessoa> permissaoPessoas;
 
     @Temporal(TemporalType.TIMESTAMP)
     private Date dataCriacao;
@@ -39,9 +40,13 @@ public class Pessoa {
     @Temporal(TemporalType.TIMESTAMP)
     private Date dataAtualizacao;
 
-    @ManyToOne
-    @JoinColumn(name = "idCidade")
-    private Cidade cidade;
+    public void setPermissaoPessoas(List<PermissaoPessoa> permissaoPessoas) {
+        for (PermissaoPessoa permissaoPessoa : permissaoPessoas) {
+            permissaoPessoa.setPessoa(this);
+        }
+
+        this.permissaoPessoas = permissaoPessoas;
+    }
 
     @Override
     public boolean equals(Object o) {

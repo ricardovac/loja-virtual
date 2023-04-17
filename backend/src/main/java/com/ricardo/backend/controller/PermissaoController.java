@@ -20,12 +20,12 @@ public class PermissaoController {
     }
 
     @PostMapping("/")
-    public Permissao inserir(Permissao permissao) {
+    public Permissao inserir(@RequestBody Permissao permissao) {
         return permissaoService.inserirPermissao(permissao);
     }
 
     @PutMapping("/")
-    public Permissao alterar(Permissao permissao) {
+    public Permissao alterar(@RequestBody Permissao permissao) {
         return permissaoService.alterarPermissao(permissao);
     }
 
