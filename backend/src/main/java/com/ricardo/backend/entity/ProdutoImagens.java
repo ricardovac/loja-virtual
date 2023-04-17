@@ -11,12 +11,11 @@ import java.util.Date;
 import java.util.Objects;
 
 @Entity
-@Table(name = "cidade")
 @Getter
 @Setter
 @ToString
 @RequiredArgsConstructor
-public class Cidade {
+public class ProdutoImagens {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
@@ -24,8 +23,8 @@ public class Cidade {
     private String nome;
 
     @ManyToOne
-    @JoinColumn(name = "idEstado")
-    private Estado estado;
+    @JoinColumn(name = "idProduto") // Alterar o nome da coluna
+    private Produto produto;
 
     @Temporal(TemporalType.TIMESTAMP)
     private Date dataCriacao;
@@ -37,8 +36,8 @@ public class Cidade {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
-        Cidade cidade = (Cidade) o;
-        return getId() != null && Objects.equals(getId(), cidade.getId());
+        ProdutoImagens that = (ProdutoImagens) o;
+        return getId() != null && Objects.equals(getId(), that.getId());
     }
 
     @Override
