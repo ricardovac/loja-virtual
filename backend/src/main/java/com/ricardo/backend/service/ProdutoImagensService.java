@@ -39,7 +39,7 @@ public class ProdutoImagensService {
                 byte[] bytes = file.getBytes();
                 assert produto != null;
                 String nomeDaImagem = String.valueOf(produto.getId()) + file.getOriginalFilename();
-                Path path = Paths.get("src/main/resources/static/img/" + nomeDaImagem);
+                Path path = Paths.get("src/main/resources/static/imagens/" + nomeDaImagem);
                 Files.write(path, bytes); // Escreve a imagem.
                 imagem.setNome(nomeDaImagem);
             }

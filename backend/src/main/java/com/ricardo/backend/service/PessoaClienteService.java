@@ -3,6 +3,7 @@ package com.ricardo.backend.service;
 import com.ricardo.backend.dto.PessoaClienteRequestDTO;
 import com.ricardo.backend.entity.Pessoa;
 import com.ricardo.backend.repository.PessoaClienteRepository;
+import jakarta.mail.MessagingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,12 +20,12 @@ public class PessoaClienteService {
     @Autowired
     private EmailService emailService;
 
-    public Pessoa registrar(PessoaClienteRequestDTO pessoaClienteRequestDTO) {
+    public Pessoa registrar(PessoaClienteRequestDTO pessoaClienteRequestDTO) throws MessagingException {
         Pessoa pessoa = new PessoaClienteRequestDTO().converter(pessoaClienteRequestDTO);
         pessoa.setDataCriacao(new Date());
         Pessoa pessoaNova = pessoaClienteRepository.saveAndFlush(pessoa);
         permissaoPessoaService.vincularPessoaPermissaoCliente(pessoaNova);
-        emailService.enviarEmailTexto(
+        emailService.enviarEmailComAnexo(
                 pessoaNova.getEmail(),
                 "Cadastro na Loja virtual",
                 "O registro na loja foi efetuado com sucesso. " +

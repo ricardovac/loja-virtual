@@ -3,6 +3,7 @@ package com.ricardo.backend.controller;
 import com.ricardo.backend.dto.PessoaClienteRequestDTO;
 import com.ricardo.backend.entity.Pessoa;
 import com.ricardo.backend.service.PessoaClienteService;
+import jakarta.mail.MessagingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -16,7 +17,7 @@ public class PessoaClienteController {
     private PessoaClienteService pessoaClienteService;
 
     @PostMapping("/")
-    public Pessoa inserir(@RequestBody PessoaClienteRequestDTO pessoaClienteRequestDTO) {
+    public Pessoa inserir(@RequestBody PessoaClienteRequestDTO pessoaClienteRequestDTO) throws MessagingException {
         return pessoaClienteService.registrar(pessoaClienteRequestDTO);
     }
 }
