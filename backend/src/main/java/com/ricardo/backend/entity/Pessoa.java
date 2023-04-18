@@ -24,6 +24,7 @@ public class Pessoa {
     private String email;
     private String senha;
     private String endereco;
+    private String cep;
 
     @ManyToOne
     @JoinColumn(name = "idCidade")
