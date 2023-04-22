@@ -9,11 +9,14 @@
     "@mui/material": "latest",
     "@types/react": "latest",
     "@types/react-dom": "latest",
+    "axios": "^1.3.6",
     "react": "latest",
     "react-dom": "latest",
     "react-scripts": "latest",
     "recharts": "^2.5.0",
-    "typescript": "latest"
+    "typescript": "latest",
+    "material-react-table": "^1.10.0",
+    "react-router-dom": "^6.10.0"
   },
   "scripts": {
     "start": "react-scripts start",
