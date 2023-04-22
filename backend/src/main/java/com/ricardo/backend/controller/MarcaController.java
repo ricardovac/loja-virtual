@@ -15,21 +15,25 @@ public class MarcaController {
     private MarcaService marcaService;
 
     @GetMapping("/")
+    @CrossOrigin("http://localhost:3000")
     public List<Marca> listarTodos() {
         return marcaService.listarTodosMarca();
     }
 
     @PostMapping("/")
-    public Marca inserir(Marca marca) {
+    @CrossOrigin("http://localhost:3000")
+    public Marca inserir(@RequestBody Marca marca) {
         return marcaService.inserirMarca(marca);
     }
 
     @PutMapping("/")
-    public Marca alterar(Marca marca) {
+    @CrossOrigin("http://localhost:3000")
+    public Marca alterar(@RequestBody Marca marca) {
         return marcaService.alterarMarca(marca);
     }
 
     @DeleteMapping("/{id}")
+    @CrossOrigin("http://localhost:3000")
     public ResponseEntity<Void> excluir(@PathVariable Long id) {
         marcaService.excluirMarca(id);
         return ResponseEntity.ok().build();

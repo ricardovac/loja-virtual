@@ -1,7 +1,10 @@
 package com.ricardo.backend.entity;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 import org.hibernate.Hibernate;
 
 import java.util.Date;
@@ -15,13 +18,12 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class Produto {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String descricaoCurta;
-    private String descricaoDetalhada;
-    private Double valorCusto;
-    private Double valorVenda;
+    private String nome;
+    private String descricao;
+    private Double valor_venda;
 
     @Temporal(TemporalType.TIMESTAMP)
     private Date dataCriacao;

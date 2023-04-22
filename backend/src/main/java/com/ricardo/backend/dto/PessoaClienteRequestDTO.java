@@ -1,6 +1,7 @@
 package com.ricardo.backend.dto;
 
 import com.ricardo.backend.entity.Pessoa;
+import jakarta.validation.constraints.Email;
 import lombok.Data;
 import org.springframework.beans.BeanUtils;
 
@@ -8,6 +9,7 @@ import org.springframework.beans.BeanUtils;
 public class PessoaClienteRequestDTO {
     private String nome;
     private String cpf;
+    @Email
     private String email;
     private String endereco;
     private String cep;
