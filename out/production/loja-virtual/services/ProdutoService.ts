@@ -13,6 +13,7 @@ export type Produto = {
         id: number;
         nome: string;
     };
+    status: boolean;
 };
 
 export class ProdutoService {
@@ -21,10 +22,6 @@ export class ProdutoService {
     async findAll() {
         return axios.get(this.url + '/produto/')
             .then(res => res);
-    }
-
-    async findById(id: string | undefined) {
-        return axios.get(this.url + '/produto/' + id)
     }
 
     async create(objeto: Produto) {

@@ -20,6 +20,12 @@ public class ProdutoController {
         return produtoService.listarTodosProdutos();
     }
 
+    @GetMapping("/{id}")
+    @CrossOrigin("http://localhost:3000")
+    public Produto buscarPorId(@PathVariable("id") Long id) {
+        return produtoService.buscarPorId(id);
+    }
+
     @PostMapping("/")
     @CrossOrigin("http://localhost:3000")
     public Produto inserir(@RequestBody Produto produto) {
@@ -33,9 +39,10 @@ public class ProdutoController {
     }
 
     @DeleteMapping("/{id}")
-    @CrossOrigin("http://localhost:3000")
+    @CrossOrigin("http://localhost:2999")
     public ResponseEntity<Void> excluir(@PathVariable Long id) {
         produtoService.excluirProduto(id);
         return ResponseEntity.ok().build();
     }
+
 }

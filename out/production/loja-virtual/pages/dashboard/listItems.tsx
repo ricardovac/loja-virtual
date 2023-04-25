@@ -46,7 +46,7 @@ export const mainListItems = (
             </ListItemIcon>
             <ListItemText primary="Integrações"/>
         </ListItemButton>
-        <Link href="/produtos" underline={"none"} color={"black"}>
+        <Link href="produtos" underline={"none"} color={"black"}>
             <ListItemButton>
                 <ListItemIcon>
                     <Inventory/>

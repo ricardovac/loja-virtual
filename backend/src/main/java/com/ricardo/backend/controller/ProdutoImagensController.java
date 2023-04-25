@@ -16,21 +16,31 @@ public class ProdutoImagensController {
     private ProdutoImagensService produtoImagensService;
 
     @GetMapping("/")
+    @CrossOrigin("http://localhost:3000")
     public List<ProdutoImagens> listarTodos() {
         return produtoImagensService.listarTodosProdutoImagens();
     }
 
+    @GetMapping("/produto/{id}")
+    @CrossOrigin("http://localhost:3000")
+    public List<ProdutoImagens> buscarPorProduto(@PathVariable("id") Long idProduto) {
+        return produtoImagensService.buscarPorProduto(idProduto);
+    }
+
     @PostMapping("/")
+    @CrossOrigin("http://localhost:3000")
     public ProdutoImagens inserir(@RequestParam("idProduto") Long idProduto, @RequestParam MultipartFile file) {
         return produtoImagensService.inserirProdutoImagens(idProduto, file);
     }
 
     @PutMapping("/")
+    @CrossOrigin("http://localhost:3000")
     public ProdutoImagens alterar(ProdutoImagens produtoImagens) {
         return produtoImagensService.alterarProdutoImagens(produtoImagens);
     }
 
     @DeleteMapping("/{id}")
+    @CrossOrigin("http://localhost:3000")
     public ResponseEntity<Void> excluir(@PathVariable Long id) {
         produtoImagensService.excluirProdutoImagens(id);
         return ResponseEntity.ok().build();

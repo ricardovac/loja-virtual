@@ -4,7 +4,6 @@ import {createBrowserRouter, RouterProvider} from "react-router-dom";
 import Produtos from "./pages/produtos/Produtos";
 import Dashboard from "./pages/dashboard/Dashboard";
 import {QueryClient, QueryClientProvider} from "react-query";
-import ProdutoImagens from "./pages/produtos/ProdutoImagens";
 
 const router = createBrowserRouter([
     {
@@ -12,12 +11,8 @@ const router = createBrowserRouter([
         element: <Dashboard/>,
     },
     {
-        path: "/produtos/",
+        path: "/produtos",
         element: <Produtos/>,
-    },
-    {
-        path: "/produtoImagens/:id",
-        element: <ProdutoImagens/>,
     },
 ]);
 

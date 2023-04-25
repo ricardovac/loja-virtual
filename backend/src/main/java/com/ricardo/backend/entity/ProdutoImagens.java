@@ -32,6 +32,9 @@ public class ProdutoImagens {
     @Temporal(TemporalType.TIMESTAMP)
     private Date dataAtualizacao;
 
+    @Transient
+    private byte[] arquivo;
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

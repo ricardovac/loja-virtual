@@ -38,4 +38,8 @@ public class ProdutoService {
         Optional<Produto> produtoOpcional = produtoRepository.findById(id);
         produtoOpcional.ifPresent(p -> produtoRepository.delete(p));
     }
+
+    public Produto buscarPorId(Long id) {
+        return produtoRepository.findById(id).get();
+    }
 }

@@ -23,15 +23,13 @@ import MaterialReactTable, {
     type MRT_ColumnDef,
     type MRT_Row,
 } from 'material-react-table';
-import {Delete, Edit, Image} from '@mui/icons-material';
+import {Delete, Edit} from '@mui/icons-material';
 import {Produto, ProdutoService} from '../../services/ProdutoService';
 import Toolbar from "@mui/material/Toolbar";
 import {Categoria, CategoriaService} from "../../services/CategoriaService";
 import {Marca, MarcaService} from "../../services/MarcaService";
 import Categorias from "./Categorias";
 import Marcas from "./Marcas";
-import {useNavigate} from "react-router-dom";
-import Link from "@mui/material/Link";
 
 const Produtos = () => {
     const [createModalOpen, setCreateModalOpen] = useState(false);
@@ -40,7 +38,6 @@ const Produtos = () => {
         [cellId: string]: string;
     }>({});
     const produtoService = new ProdutoService()
-    const navigate = useNavigate();
 
     useEffect(() => {
         produtoService.findAll().then((r) => setTodosProdutos(r.data));
@@ -197,22 +194,15 @@ const Produtos = () => {
                     onEditingRowCancel={handleCancelRowEdits}
                     renderRowActions={({row, table}) => (
                         <Box sx={{display: 'flex', gap: '1rem'}}>
-                            <Tooltip arrow placement="left" title="Editar">
+                            <Tooltip arrow placement="left" title="Edit">
                                 <IconButton onClick={() => table.setEditingRow(row)}>
                                     <Edit/>
                                 </IconButton>
                             </Tooltip>
-                            <Tooltip arrow placement="right" title="Deletar">
+                            <Tooltip arrow placement="right" title="Delete">
                                 <IconButton color="error" onClick={() => handleDeletarProduto(row)}>
                                     <Delete/>
                                 </IconButton>
-                            </Tooltip>
-                            <Tooltip arrow placement="right" title="Imagem">
-                                <Link href={`/produtoImagens/${row.getValue('id')}`}>
-                                    <IconButton color="info">
-                                        <Image/>
-                                    </IconButton>
-                                </Link>
                             </Tooltip>
                         </Box>
                     )}
@@ -262,22 +252,18 @@ export const ModalCriarProduto = ({
     );
     const [selectedCategoria, setSelectedCategoria] = useState('');
     const [selectedMarca, setSelectedMarca] = useState('');
-    const [todasCategorias, setTodasCategorias] = useState<Categoria[]>([]);
-    const [todasMarcas, setTodasMarcas] = useState<Marca[]>([]);
+    const [allCategoria, setAllCategoria] = useState<Categoria[]>([]);
+    const [allMarca, setAllMarca] = useState<Marca[]>([]);
     const categoriaService = new CategoriaService()
     const marcaService = new MarcaService()
 
     useEffect(() => {
-        marcaService.findAll().then((r) => setTodasMarcas(r.data));
-        categoriaService.findAll().then((r) => setTodasCategorias(r.data));
+        marcaService.findAll().then((r) => setAllMarca(r.data));
+        categoriaService.findAll().then((r) => setAllCategoria(r.data));
     }, []);
 
     const handleSubmit = () => {
-        const valuesWithSelections = {
-            ...values,
-            categoria: {id: selectedCategoria},
-            marca: {id: selectedMarca},
-        };
+        const valuesWithSelections = {...values, categoria: {id: selectedCategoria}, marca: {id: selectedMarca}};
         onSubmit(valuesWithSelections);
         onClose();
     };
@@ -305,7 +291,7 @@ export const ModalCriarProduto = ({
                                         label="Categoria"
                                         onChange={(event) => setSelectedCategoria(event.target.value)}
                                     >
-                                        {todasCategorias.map((categoria) => (
+                                        {allCategoria.map((categoria) => (
                                             <MenuItem value={categoria.id}
                                                       key={categoria.id}>{categoria.nome}</MenuItem>
                                         ))}
@@ -321,7 +307,7 @@ export const ModalCriarProduto = ({
                                         label="Marca"
                                         onChange={(event) => setSelectedMarca(event.target.value)}
                                     >
-                                        {todasMarcas.map((marca) => (
+                                        {allMarca.map((marca) => (
                                             <MenuItem value={marca.id} key={marca.id}>{marca.nome}</MenuItem>
                                         ))}
                                     </Select>
@@ -341,14 +327,6 @@ export const ModalCriarProduto = ({
                                         ...values,
                                         [e.target.name]: e.target.value
                                     })}
-                                    onKeyPress={(e) => {
-                                        if (column.accessorKey === 'valor_venda') {
-                                            const inputChar = String.fromCharCode(e.charCode);
-                                            if (!/^\d+$/.test(inputChar)) {  // check if keystroke is a numeric character
-                                                e.preventDefault();  // prevent the keystroke from being entered
-                                            }
-                                        }
-                                    }}
                                     disabled={column.accessorKey === 'id'}
                                 />
                             )
