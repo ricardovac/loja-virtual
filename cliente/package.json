@@ -13,6 +13,7 @@
     "material-react-table": "^1.10.0",
     "react": "latest",
     "react-dom": "latest",
+    "react-input-mask": "^2.0.4",
     "react-query": "^3.39.3",
     "react-router-dom": "^6.10.0",
     "react-scripts": "latest",

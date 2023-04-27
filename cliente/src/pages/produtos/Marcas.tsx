@@ -35,18 +35,23 @@ const Marcas = () => {
     }, []);
 
     const handleCriarMarca = async (values: Marca) => {
-        await marcaService.create(values);
+        const response = await marcaService.create(values);
+        if (response.status == 200) {
+            setAllMarca(response.data)
+            setCreateModalOpen(false); // close the create modal
+        }
     };
 
     const handleSaveRowEdits: MaterialReactTableProps<Marca>['onEditingRowSave'] =
         async ({exitEditingMode, row, values}) => {
             if (!Object.keys(validationErrors).length) {
-                if (allMarca) {
-                    allMarca[row.index] = values;
-                }
                 //send/receive api updates here, then refetch or update local table data for re-render
-                await marcaService.edit(values)
-                exitEditingMode(); //required to exit editing mode and close modal
+                const response = await marcaService.edit(values)
+                if (response.status == 200) {
+                    allMarca[row.index] = response.data;
+                    setAllMarca([...allMarca])
+                    exitEditingMode(); //required to exit editing mode and close modal
+                }
             }
         };
 
@@ -61,10 +66,12 @@ const Marcas = () => {
             ) {
                 return;
             }
-            //send api delete request here, then refetch or update local table data for re-render
-            await marcaService.delete(row.getValue('id'))
+            const response = await marcaService.delete(row.getValue('id'))
+            if (response.status == 200) {
+                setAllMarca(allMarca.filter(p => p.id !== row.getValue('id')));
+            }
         },
-        [],
+        [allMarca],
     );
 
     const getCommonEditTextFieldProps = useCallback(
@@ -147,7 +154,6 @@ const Marcas = () => {
                     columns={columns}
                     data={allMarca}
                     editingMode="modal" //default
-                    enableColumnOrdering
                     enableEditing
                     onEditingRowSave={handleSaveRowEdits}
                     onEditingRowCancel={handleCancelRowEdits}

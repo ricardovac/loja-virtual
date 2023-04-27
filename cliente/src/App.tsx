@@ -5,20 +5,25 @@ import Produtos from "./pages/produtos/Produtos";
 import Dashboard from "./pages/dashboard/Dashboard";
 import {QueryClient, QueryClientProvider} from "react-query";
 import ProdutoImagens from "./pages/produtos/ProdutoImagens";
+import Pessoas from "./pages/pessoas/Pessoas";
 
 const router = createBrowserRouter([
     {
         path: "/",
-        element: <Produtos/>,
+        element: <Dashboard/>
     },
     {
-        path: "/dashboard/",
-        element: <Dashboard/>,
+        path: "/produtos/",
+        element: <Produtos/>,
     },
     {
         path: "/produtoImagens/:id",
         element: <ProdutoImagens/>,
     },
+    {
+        path: "/pessoas/",
+        element: <Pessoas/>
+    }
 ]);
 
 const queryClient = new QueryClient()

@@ -7,6 +7,7 @@ import com.ricardo.backend.repository.ProdutoRepository;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.FileInputStream;
@@ -18,6 +19,7 @@ import java.nio.file.Paths;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class ProdutoImagensService {
@@ -46,18 +48,20 @@ public class ProdutoImagensService {
     }
 
     public ProdutoImagens inserirProdutoImagens(Long idProduto, MultipartFile file) {
+        // Acha o produto por Id.
         Produto produto = produtoRepository.findById(idProduto).orElse(null);
+        // Coloca o nome
         ProdutoImagens produtoImagens = new ProdutoImagens();
+        String imageName = UUID.randomUUID() + "." + StringUtils.getFilenameExtension(file.getOriginalFilename());
 
         try {
             if (!file.isEmpty()) {
                 byte[] bytes = file.getBytes();
                 assert produto != null;
-                String nomeImagem = produto.getId() + file.getOriginalFilename();
-                Path caminho = Paths
-                        .get(imagePath + nomeImagem);
+//                String nomeImagem = produto.getId() + file.getOriginalFilename();
+                Path caminho = Paths.get(imagePath + imageName);
                 Files.write(caminho, bytes);
-                produtoImagens.setNome(nomeImagem);
+                produtoImagens.setNome(imageName);
             }
         } catch (IOException e) {
             e.printStackTrace();

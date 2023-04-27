@@ -19,6 +19,7 @@ const ProdutoImagens = () => {
         if (objetos == null) {
             produtoService.findById(params.id).then((result) => {
                 setProduto(result.data);
+                // Apenas o id do produto para buscar
                 buscarPorProduto(result.data.id);
             });
         }
@@ -64,7 +65,7 @@ const ProdutoImagens = () => {
                 </Box>
                 <ImageList sx={{width: 500, height: 450}} cols={3} rowHeight={164}>
                     <ImageListItem>
-                        <img src={`data:image/jpeg;base64, `} alt={""}/>
+                        <img src={""} alt={""}/>
                     </ImageListItem>
                 </ImageList>
             </Box>

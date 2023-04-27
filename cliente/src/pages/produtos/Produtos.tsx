@@ -18,7 +18,7 @@ import {
     Tooltip
 } from "@mui/material";
 import MaterialReactTable, {
-    type MaterialReactTableProps,
+    MaterialReactTableProps,
     type MRT_Cell,
     type MRT_ColumnDef,
     type MRT_Row,
@@ -30,7 +30,6 @@ import {Categoria, CategoriaService} from "../../services/CategoriaService";
 import {Marca, MarcaService} from "../../services/MarcaService";
 import Categorias from "./Categorias";
 import Marcas from "./Marcas";
-import {useNavigate} from "react-router-dom";
 import Link from "@mui/material/Link";
 
 const Produtos = () => {
@@ -40,25 +39,31 @@ const Produtos = () => {
         [cellId: string]: string;
     }>({});
     const produtoService = new ProdutoService()
-    const navigate = useNavigate();
 
     useEffect(() => {
         produtoService.findAll().then((r) => setTodosProdutos(r.data));
     }, []);
 
     const handleCriarProduto = async (values: Produto) => {
-        await produtoService.create(values);
+        const response = await produtoService.create(values);
+        if (response.status === 200) {
+            setTodosProdutos([...todosProdutos, response.data]); // add newly created Produto to the todosProdutos array
+            setCreateModalOpen(false); // close the create modal
+        }
     };
 
     const handleEditarProduto: MaterialReactTableProps<Produto>['onEditingRowSave'] =
         async ({exitEditingMode, row, values}) => {
             if (!Object.keys(validationErrors).length) {
-                todosProdutos[row.index] = values;
-                //send/receive api updates here, then refetch or update local table data for re-render
-                await produtoService.edit(values)
-                exitEditingMode(); //required to exit editing mode and close modal
+                const response = await produtoService.edit(values);
+                if (response.status === 200) {
+                    todosProdutos[row.index] = response.data; // update edited Produto in todosProdutos array
+                    setTodosProdutos([...todosProdutos]); // trigger a re-render by updating todosProdutos state
+                    exitEditingMode(); // exit editing mode and close modal
+                }
             }
         };
+
 
     const handleCancelRowEdits = () => {
         setValidationErrors({});
@@ -72,9 +77,12 @@ const Produtos = () => {
                 return;
             }
             //send api delete request here, then refetch or update local table data for re-render
-            await produtoService.delete(row.getValue('id'))
+            const response = await produtoService.delete(row.getValue('id'));
+            if (response.status === 200) {
+                setTodosProdutos(todosProdutos.filter(p => p.id !== row.getValue('id'))); // remove deleted Produto from todosProdutos array
+            }
         },
-        [],
+        [todosProdutos],
     );
 
     const getCommonEditTextFieldProps = useCallback(
@@ -191,7 +199,6 @@ const Produtos = () => {
                     columns={columns}
                     data={todosProdutos}
                     editingMode="modal" //default
-                    enableColumnOrdering
                     enableEditing
                     onEditingRowSave={handleEditarProduto}
                     onEditingRowCancel={handleCancelRowEdits}

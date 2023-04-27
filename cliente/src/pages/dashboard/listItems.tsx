@@ -12,7 +12,7 @@ import {LocationCity, Lock, Place} from "@mui/icons-material";
 
 export const mainListItems = (
     <React.Fragment>
-        <Link href="/dashboard" underline={"none"} color={"black"}>
+        <Link href="/" underline={"none"} color={"black"}>
             <ListItemButton>
                 <ListItemIcon>
                     <DashboardIcon/>
@@ -20,7 +20,7 @@ export const mainListItems = (
                 <ListItemText primary="Dashboard"/>
             </ListItemButton>
         </Link>
-        <Link href="/" underline={"none"} color={"black"}>
+        <Link href="/produtos" underline={"none"} color={"black"}>
             <ListItemButton>
                 <ListItemIcon>
                     <Inventory/>
@@ -28,12 +28,14 @@ export const mainListItems = (
                 <ListItemText primary="Produtos"/>
             </ListItemButton>
         </Link>
-        <ListItemButton>
-            <ListItemIcon>
-                <PeopleIcon/>
-            </ListItemIcon>
-            <ListItemText primary="Pessoas"/>
-        </ListItemButton>
+        <Link href="/pessoas" underline={"none"} color={"black"}>
+            <ListItemButton>
+                <ListItemIcon>
+                    <PeopleIcon/>
+                </ListItemIcon>
+                <ListItemText primary="Pessoas"/>
+            </ListItemButton>
+        </Link>
         <ListItemButton>
             <ListItemIcon>
                 <Lock/>

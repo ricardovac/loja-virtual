@@ -35,18 +35,22 @@ const Categorias = () => {
     }, []);
 
     const handleCriarCategoria = async (values: Categoria) => {
-        await categoriaService.create(values);
+        const response = await categoriaService.create(values);
+        if (response.status == 200) {
+            setAllCategoria([...allCategoria, response.data])
+            setCreateModalOpen(false); // close the create modal
+        }
     };
 
     const handleSaveRowEdits: MaterialReactTableProps<Categoria>['onEditingRowSave'] =
         async ({exitEditingMode, row, values}) => {
             if (!Object.keys(validationErrors).length) {
-                if (allCategoria) {
-                    allCategoria[row.index] = values;
+                const response = await categoriaService.edit(values)
+                if (response.status == 200) {
+                    allCategoria[row.index] = response.data;
+                    setAllCategoria([...allCategoria])
+                    exitEditingMode(); //required to exit editing mode and close modal
                 }
-                //send/receive api updates here, then refetch or update local table data for re-render
-                await categoriaService.edit(values)
-                exitEditingMode(); //required to exit editing mode and close modal
             }
         };
 
@@ -61,10 +65,12 @@ const Categorias = () => {
             ) {
                 return;
             }
-            //send api delete request here, then refetch or update local table data for re-render
-            await categoriaService.delete(row.getValue('id'))
+            const response = await categoriaService.delete(row.getValue('id'))
+            if (response.status == 200) {
+                setAllCategoria(allCategoria.filter(p => p.id !== row.getValue('id')));
+            }
         },
-        [],
+        [allCategoria],
     );
 
     const getCommonEditTextFieldProps = useCallback(
@@ -147,7 +153,6 @@ const Categorias = () => {
                     columns={columns}
                     data={allCategoria}
                     editingMode="modal" //default
-                    enableColumnOrdering
                     enableEditing
                     onEditingRowSave={handleSaveRowEdits}
                     onEditingRowCancel={handleCancelRowEdits}
