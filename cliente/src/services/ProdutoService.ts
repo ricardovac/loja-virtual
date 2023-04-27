@@ -1,7 +1,7 @@
 import axios from "axios";
 
 export type Produto = {
-    id: string;
+    id: number;
     nome: string;
     descricao: string;
     valor_venda: number;
@@ -23,7 +23,7 @@ export class ProdutoService {
             .then(res => res);
     }
 
-    async findById(id: string | undefined) {
+    async findById(id: number | string | undefined) {
         return axios.get(this.url + '/produto/' + id)
     }
 

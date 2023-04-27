@@ -21,6 +21,7 @@ import java.util.Optional;
 
 @Service
 public class ProdutoImagensService {
+    private final String imagePath = "backend/src/main/resources/static/img/";
     @Autowired
     private ProdutoImagensRepository produtoImagensRepository;
     @Autowired
@@ -34,7 +35,7 @@ public class ProdutoImagensService {
         List<ProdutoImagens> listaProdutoImagens = produtoImagensRepository.findByProdutoId(idProduto);
 
         for (ProdutoImagens produtoImagens : listaProdutoImagens) {
-            try (InputStream in = new FileInputStream("c:/imagens/" + produtoImagens.getNome())) {
+            try (InputStream in = new FileInputStream(imagePath + produtoImagens.getNome())) {
                 produtoImagens.setArquivo(IOUtils.toByteArray(in));
             } catch (IOException e) {
                 e.printStackTrace();
@@ -44,30 +45,28 @@ public class ProdutoImagensService {
         return listaProdutoImagens;
     }
 
-    public ProdutoImagens inserirProdutoImagens(Long id, MultipartFile file) {
-        Produto produto = null;
-        if (produtoRepository.findById(id).isPresent()) {
-            produto = produtoRepository.findById(id).get();
-        }
-        ProdutoImagens imagem = new ProdutoImagens();
+    public ProdutoImagens inserirProdutoImagens(Long idProduto, MultipartFile file) {
+        Produto produto = produtoRepository.findById(idProduto).orElse(null);
+        ProdutoImagens produtoImagens = new ProdutoImagens();
 
         try {
             if (!file.isEmpty()) {
                 byte[] bytes = file.getBytes();
                 assert produto != null;
-                String nomeDaImagem = String.valueOf(produto.getId()) + file.getOriginalFilename();
-                Path path = Paths.get("src/main/resources/static/imagens/" + nomeDaImagem);
-                Files.write(path, bytes); // Escreve a imagem.
-                imagem.setNome(nomeDaImagem);
+                String nomeImagem = produto.getId() + file.getOriginalFilename();
+                Path caminho = Paths
+                        .get(imagePath + nomeImagem);
+                Files.write(caminho, bytes);
+                produtoImagens.setNome(nomeImagem);
             }
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
         }
 
-        imagem.setProduto(produto);
-        imagem.setDataCriacao(new Date());
-        imagem = produtoImagensRepository.saveAndFlush(imagem);
-        return imagem;
+        produtoImagens.setProduto(produto);
+        produtoImagens.setDataCriacao(new Date());
+        produtoImagens = produtoImagensRepository.saveAndFlush(produtoImagens);
+        return produtoImagens;
     }
 
     public ProdutoImagens alterarProdutoImagens(ProdutoImagens produtoImagens) {

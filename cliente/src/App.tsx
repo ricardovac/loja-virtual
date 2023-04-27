@@ -9,11 +9,11 @@ import ProdutoImagens from "./pages/produtos/ProdutoImagens";
 const router = createBrowserRouter([
     {
         path: "/",
-        element: <Dashboard/>,
+        element: <Produtos/>,
     },
     {
-        path: "/produtos/",
-        element: <Produtos/>,
+        path: "/dashboard/",
+        element: <Dashboard/>,
     },
     {
         path: "/produtoImagens/:id",

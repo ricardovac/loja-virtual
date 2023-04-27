@@ -1,10 +1,8 @@
 import axios from "axios";
 
-export interface produtoImagens {
+export interface IProdutoImagens {
     idProduto: string,
     file: File | any,
-    nome: string,
-    nomeProduto: string;
 }
 
 export class ProdutoImagemService {
@@ -15,7 +13,7 @@ export class ProdutoImagemService {
             .then(res => res);
     }
 
-    async upload(objeto: produtoImagens) {
+    async upload(objeto: IProdutoImagens) {
         const formData = new FormData()
         formData.append('idProduto', objeto.idProduto)
         formData.append('file', objeto.file)
@@ -29,11 +27,11 @@ export class ProdutoImagemService {
             .then(res => res)
     }
 
-    async findProduto(idProduto: number) {
+    async buscarPorProduto(idProduto: number) {
         return axios.get(this.url + "/produto/" + idProduto);
     }
 
     async deleteProduto(idProduto: string | undefined | number) {
-        return axios.delete(this.url + "/produto/" + idProduto);
+        return axios.delete(this.url + "/produtoImagens/" + idProduto);
     }
 }
