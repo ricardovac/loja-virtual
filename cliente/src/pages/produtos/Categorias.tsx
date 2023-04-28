@@ -1,17 +1,15 @@
 import * as React from 'react';
 import {useCallback, useEffect, useMemo, useState} from 'react';
-import {
-    Box,
-    Button,
-    Dialog,
-    DialogActions,
-    DialogContent,
-    DialogTitle,
-    IconButton,
-    Stack,
-    TextField,
-    Tooltip
-} from "@mui/material";
+import Box from "@mui/material/Box"
+import Button from "@mui/material/Button"
+import Dialog from "@mui/material/Dialog"
+import DialogActions from "@mui/material/DialogActions"
+import DialogContent from "@mui/material/DialogContent"
+import DialogTitle from "@mui/material/DialogTitle"
+import IconButton from "@mui/material/IconButton"
+import Stack from "@mui/material/Stack"
+import TextField from "@mui/material/TextField"
+import Tooltip from "@mui/material/Tooltip"
 import MaterialReactTable, {
     type MaterialReactTableProps,
     type MRT_Cell,
@@ -25,13 +23,31 @@ import {Categoria, CategoriaService} from "../../services/CategoriaService";
 const Categorias = () => {
     const [createModalOpen, setCreateModalOpen] = useState(false);
     const [allCategoria, setAllCategoria] = useState<Categoria[]>([]);
+    const [isError, setIsError] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
+    const [isRefetching, setIsRefetching] = useState(true);
     const [validationErrors, setValidationErrors] = useState<{
         [cellId: string]: string;
     }>({});
     const categoriaService = new CategoriaService()
 
     useEffect(() => {
-        categoriaService.findAll().then((r) => setAllCategoria(r.data));
+        const fetchData = () => {
+            setIsLoading(true);
+            setIsRefetching(true);
+
+            try {
+                categoriaService.findAll().then((r) => setAllCategoria(r.data));
+            } catch (e) {
+                setIsError(true)
+                console.error(e)
+                return
+            }
+            setIsError(false);
+            setIsLoading(false);
+            setIsRefetching(false);
+        }
+        fetchData()
     }, []);
 
     const handleCriarCategoria = async (values: Categoria) => {
@@ -179,6 +195,11 @@ const Categorias = () => {
                             Adicionar Categoria
                         </Button>
                     )}
+                    state={{
+                        isLoading,
+                        showAlertBanner: isError,
+                        showProgressBars: isRefetching,
+                    }}
                 />
                 <ModalCriarCategoria
                     columns={columns}

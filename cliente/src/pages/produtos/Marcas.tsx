@@ -1,55 +1,72 @@
-import * as React from 'react';
-import {useCallback, useEffect, useMemo, useState} from 'react';
-import {
-    Box,
-    Button,
-    Dialog,
-    DialogActions,
-    DialogContent,
-    DialogTitle,
-    IconButton,
-    Stack,
-    TextField,
-    Tooltip
-} from "@mui/material";
+import * as React from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
+import Dialog from "@mui/material/Dialog";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
+import DialogTitle from "@mui/material/DialogTitle";
+import IconButton from "@mui/material/IconButton";
+import Stack from "@mui/material/Stack";
+import TextField from "@mui/material/TextField";
+import Tooltip from "@mui/material/Tooltip";
 import MaterialReactTable, {
     type MaterialReactTableProps,
     type MRT_Cell,
     type MRT_ColumnDef,
     type MRT_Row,
-} from 'material-react-table';
-import {Delete, Edit} from '@mui/icons-material';
+} from "material-react-table";
+import { Delete, Edit } from "@mui/icons-material";
 import Toolbar from "@mui/material/Toolbar";
-import {Marca, MarcaService} from "../../services/MarcaService";
+import { Marca, MarcaService } from "../../services/MarcaService";
 
 const Marcas = () => {
     const [createModalOpen, setCreateModalOpen] = useState(false);
     const [allMarca, setAllMarca] = useState<Marca[]>([]);
+    const [isError, setIsError] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
+    const [isRefetching, setIsRefetching] = useState(true);
     const [validationErrors, setValidationErrors] = useState<{
         [cellId: string]: string;
     }>({});
-    const marcaService = new MarcaService()
+    const marcaService = new MarcaService();
+
+    const fetchData = () => {
+        setIsLoading(true);
+        setIsRefetching(true);
+
+        try {
+            marcaService.findAll().then((r) => setAllMarca(r.data));
+        } catch (e) {
+            setIsError(true);
+            console.error(e);
+            return;
+        }
+        setIsError(false);
+        setIsLoading(false);
+        setIsRefetching(false);
+    };
 
     useEffect(() => {
-        marcaService.findAll().then((r) => setAllMarca(r.data));
+        fetchData();
     }, []);
 
     const handleCriarMarca = async (values: Marca) => {
         const response = await marcaService.create(values);
         if (response.status == 200) {
-            setAllMarca(response.data)
+            setAllMarca(response.data);
             setCreateModalOpen(false); // close the create modal
         }
     };
 
-    const handleSaveRowEdits: MaterialReactTableProps<Marca>['onEditingRowSave'] =
-        async ({exitEditingMode, row, values}) => {
+    const handleSaveRowEdits: MaterialReactTableProps<Marca>["onEditingRowSave"] =
+        async ({ exitEditingMode, row, values }) => {
             if (!Object.keys(validationErrors).length) {
                 //send/receive api updates here, then refetch or update local table data for re-render
-                const response = await marcaService.edit(values)
+                const response = await marcaService.edit(values);
                 if (response.status == 200) {
                     allMarca[row.index] = response.data;
-                    setAllMarca([...allMarca])
+                    setAllMarca([...allMarca]);
                     exitEditingMode(); //required to exit editing mode and close modal
                 }
             }
@@ -62,28 +79,32 @@ const Marcas = () => {
     const handleDeletarMarca = useCallback(
         async (row: MRT_Row<Marca>) => {
             if (
-                !confirm(`Are you sure you want to delete ${row.getValue('nome')}`)
+                !confirm(
+                    `Are you sure you want to delete ${row.getValue("nome")}`
+                )
             ) {
                 return;
             }
-            const response = await marcaService.delete(row.getValue('id'))
+            const response = await marcaService.delete(row.getValue("id"));
             if (response.status == 200) {
-                setAllMarca(allMarca.filter(p => p.id !== row.getValue('id')));
+                setAllMarca(
+                    allMarca.filter((p) => p.id !== row.getValue("id"))
+                );
             }
         },
-        [allMarca],
+        [allMarca]
     );
 
     const getCommonEditTextFieldProps = useCallback(
         (
-            cell: MRT_Cell<Marca>,
-        ): MRT_ColumnDef<Marca>['muiTableBodyCellEditTextFieldProps'] => {
+            cell: MRT_Cell<Marca>
+        ): MRT_ColumnDef<Marca>["muiTableBodyCellEditTextFieldProps"] => {
             return {
                 error: !!validationErrors[cell.id],
                 helperText: validationErrors[cell.id],
                 onBlur: (event: any) => {
                     const isValid =
-                        cell.column.id === 'nome'
+                        cell.column.id === "nome"
                             ? validateNome(event.target.value)
                             : validateRequired(event.target.value);
                     if (!isValid) {
@@ -102,29 +123,29 @@ const Marcas = () => {
                 },
             };
         },
-        [validationErrors],
+        [validationErrors]
     );
 
     const columns = useMemo<MRT_ColumnDef<Marca>[]>(
         () => [
             {
-                accessorKey: 'id',
-                header: 'ID',
+                accessorKey: "id",
+                header: "ID",
                 enableColumnOrdering: false,
                 enableEditing: false, //disable editing on this column
                 enableSorting: false,
                 size: 80,
             },
             {
-                accessorKey: 'nome',
-                header: 'Nome',
+                accessorKey: "nome",
+                header: "Nome",
                 size: 140,
-                muiTableBodyCellEditTextFieldProps: ({cell}: any) => ({
+                muiTableBodyCellEditTextFieldProps: ({ cell }: any) => ({
                     ...getCommonEditTextFieldProps(cell),
                 }),
             },
         ],
-        [getCommonEditTextFieldProps],
+        [getCommonEditTextFieldProps]
     );
 
     return (
@@ -133,20 +154,20 @@ const Marcas = () => {
                 component="main"
                 sx={{
                     backgroundColor: (theme) =>
-                        theme.palette.mode === 'light'
+                        theme.palette.mode === "light"
                             ? theme.palette.grey[100]
                             : theme.palette.grey[900],
                     flexGrow: 1,
-                    height: '100vh',
-                    overflow: 'auto',
+                    height: "100vh",
+                    overflow: "auto",
                 }}
             >
-                <Toolbar/>
+                <Toolbar />
                 <MaterialReactTable
                     displayColumnDefOptions={{
-                        'mrt-row-actions': {
+                        "mrt-row-actions": {
                             muiTableHeadCellProps: {
-                                align: 'center',
+                                align: "center",
                             },
                             size: 120,
                         },
@@ -157,16 +178,21 @@ const Marcas = () => {
                     enableEditing
                     onEditingRowSave={handleSaveRowEdits}
                     onEditingRowCancel={handleCancelRowEdits}
-                    renderRowActions={({row, table}) => (
-                        <Box sx={{display: 'flex', gap: '1rem'}}>
+                    renderRowActions={({ row, table }) => (
+                        <Box sx={{ display: "flex", gap: "1rem" }}>
                             <Tooltip arrow placement="left" title="Edit">
-                                <IconButton onClick={() => table.setEditingRow(row)}>
-                                    <Edit/>
+                                <IconButton
+                                    onClick={() => table.setEditingRow(row)}
+                                >
+                                    <Edit />
                                 </IconButton>
                             </Tooltip>
                             <Tooltip arrow placement="right" title="Delete">
-                                <IconButton color="error" onClick={() => handleDeletarMarca(row)}>
-                                    <Delete/>
+                                <IconButton
+                                    color="error"
+                                    onClick={() => handleDeletarMarca(row)}
+                                >
+                                    <Delete />
                                 </IconButton>
                             </Tooltip>
                         </Box>
@@ -180,6 +206,11 @@ const Marcas = () => {
                             Adicionar Marca
                         </Button>
                     )}
+                    state={{
+                        isLoading,
+                        showAlertBanner: isError,
+                        showProgressBars: isRefetching,
+                    }}
                 />
                 <ModalCriarMarca
                     columns={columns}
@@ -200,16 +231,16 @@ interface CreateModalProps {
 }
 
 export const ModalCriarMarca = ({
-                                    open,
-                                    columns,
-                                    onClose,
-                                    onSubmit,
-                                }: CreateModalProps) => {
+    open,
+    columns,
+    onClose,
+    onSubmit,
+}: CreateModalProps) => {
     const [values, setValues] = useState<any>(() =>
         columns.reduce((acc, column) => {
-            acc[column.accessorKey ?? ''] = '';
+            acc[column.accessorKey ?? ""] = "";
             return acc;
-        }, {} as any),
+        }, {} as any)
     );
 
     const handleSubmit = () => {
@@ -224,19 +255,23 @@ export const ModalCriarMarca = ({
                 <form onSubmit={(e) => e.preventDefault()}>
                     <Stack
                         sx={{
-                            width: '100%',
-                            minWidth: {xs: '300px', sm: '360px', md: '400px'},
-                            gap: '1.5rem',
+                            width: "100%",
+                            minWidth: { xs: "300px", sm: "360px", md: "400px" },
+                            gap: "1.5rem",
                         }}
                     >
-                        {columns.map((column) =>
-                                column.accessorKey !== 'id' && (
+                        {columns.map(
+                            (column) =>
+                                column.accessorKey !== "id" && (
                                     <TextField
                                         key={column.accessorKey}
                                         label={column.header}
                                         name={column.accessorKey}
                                         onChange={(e) =>
-                                            setValues({...values, [e.target.name]: e.target.value})
+                                            setValues({
+                                                ...values,
+                                                [e.target.name]: e.target.value,
+                                            })
                                         }
                                     />
                                 )
@@ -244,9 +279,15 @@ export const ModalCriarMarca = ({
                     </Stack>
                 </form>
             </DialogContent>
-            <DialogActions sx={{p: '1.25rem'}}>
+            <DialogActions sx={{ p: "1.25rem" }}>
                 <Button onClick={onClose}>Cancel</Button>
-                <Button color="secondary" onClick={handleSubmit} variant="contained">Adicionar Marca</Button>
+                <Button
+                    color="secondary"
+                    onClick={handleSubmit}
+                    variant="contained"
+                >
+                    Adicionar Marca
+                </Button>
             </DialogActions>
         </Dialog>
     );

@@ -1,5 +1,5 @@
-import * as React from 'react';
-import {useCallback, useEffect, useMemo, useState} from 'react';
+import * as React from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
     Box,
     Button,
@@ -15,55 +15,87 @@ import {
     Select,
     Stack,
     TextField,
-    Tooltip
+    Tooltip,
 } from "@mui/material";
 import MaterialReactTable, {
     MaterialReactTableProps,
     type MRT_Cell,
     type MRT_ColumnDef,
     type MRT_Row,
-} from 'material-react-table';
-import {Delete, Edit, Image} from '@mui/icons-material';
-import {Produto, ProdutoService} from '../../services/ProdutoService';
+} from "material-react-table";
+import Delete from "@mui/icons-material/Delete";
+import Edit from "@mui/icons-material/Edit";
+import Image from "@mui/icons-material/Image";
+import { Produto, ProdutoService } from "../../services/ProdutoService";
 import Toolbar from "@mui/material/Toolbar";
-import {Categoria, CategoriaService} from "../../services/CategoriaService";
-import {Marca, MarcaService} from "../../services/MarcaService";
+import { Categoria, CategoriaService } from "../../services/CategoriaService";
+import { Marca, MarcaService } from "../../services/MarcaService";
 import Categorias from "./Categorias";
 import Marcas from "./Marcas";
 import Link from "@mui/material/Link";
+import { ConstructionSharp, LocalTaxiOutlined } from "@mui/icons-material";
 
+// FIX: Fazer a selection box para a edição de produtos.
+// FIX: re-render na categoria e marca na criação de produtos.
 const Produtos = () => {
     const [createModalOpen, setCreateModalOpen] = useState(false);
     const [todosProdutos, setTodosProdutos] = useState<Produto[]>([]);
+    const [isError, setIsError] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
+    const [isRefetching, setIsRefetching] = useState(true);
     const [validationErrors, setValidationErrors] = useState<{
         [cellId: string]: string;
     }>({});
-    const produtoService = new ProdutoService()
+    const produtoService = new ProdutoService();
+    const marcaService = new MarcaService();
+    const categoriaService = new CategoriaService();
+
+    const fetchData = () => {
+        try {
+            produtoService.findAll().then((r) => setTodosProdutos(r.data));
+        } catch (e) {
+            setIsError(true);
+            console.error(e);
+            return;
+        }
+        setIsError(false);
+        setIsLoading(false);
+        setIsRefetching(false);
+    };
 
     useEffect(() => {
-        produtoService.findAll().then((r) => setTodosProdutos(r.data));
+        fetchData();
     }, []);
-
     const handleCriarProduto = async (values: Produto) => {
-        const response = await produtoService.create(values);
-        if (response.status === 200) {
-            setTodosProdutos([...todosProdutos, response.data]); // add newly created Produto to the todosProdutos array
+        try {
+            const response = await produtoService.create(values);
+            if (response.status === 200) {
+                setTodosProdutos([...todosProdutos, response.data]); // add newly created Produto to the todosProdutos array
+            }
+        } catch (error) {
+            console.error(error);
+        } finally {
             setCreateModalOpen(false); // close the create modal
+            window.location.reload();
         }
     };
 
-    const handleEditarProduto: MaterialReactTableProps<Produto>['onEditingRowSave'] =
-        async ({exitEditingMode, row, values}) => {
+    const handleEditarProduto: MaterialReactTableProps<Produto>["onEditingRowSave"] =
+        async ({ exitEditingMode, row, values }) => {
             if (!Object.keys(validationErrors).length) {
-                const response = await produtoService.edit(values);
-                if (response.status === 200) {
-                    todosProdutos[row.index] = response.data; // update edited Produto in todosProdutos array
-                    setTodosProdutos([...todosProdutos]); // trigger a re-render by updating todosProdutos state
-                    exitEditingMode(); // exit editing mode and close modal
-                }
+                const originalProduto = row.original;
+                const updatedProduto = {
+                    ...originalProduto,
+                    nome: values.nome,
+                    descricao: values.descricao,
+                    valor_venda: values.valor_venda,
+                };
+                const response = await produtoService.edit(updatedProduto);
+                todosProdutos[row.index] = response.data; // update edited Produto in todosProdutos array
+                setTodosProdutos([...todosProdutos]); // trigger a re-render by updating todosProdutos state
+                exitEditingMode(); // exit editing mode and close modal
             }
         };
-
 
     const handleCancelRowEdits = () => {
         setValidationErrors({});
@@ -72,33 +104,37 @@ const Produtos = () => {
     const handleDeletarProduto = useCallback(
         async (row: MRT_Row<Produto>) => {
             if (
-                !confirm(`Tem certeza que deseja deletar ${row.getValue('nome')}`)
+                !confirm(
+                    `Tem certeza que deseja deletar ${row.getValue("nome")}`
+                )
             ) {
                 return;
             }
             //send api delete request here, then refetch or update local table data for re-render
-            const response = await produtoService.delete(row.getValue('id'));
+            const response = await produtoService.delete(row.getValue("id"));
             if (response.status === 200) {
-                setTodosProdutos(todosProdutos.filter(p => p.id !== row.getValue('id'))); // remove deleted Produto from todosProdutos array
+                setTodosProdutos(
+                    todosProdutos.filter((p) => p.id !== row.getValue("id"))
+                ); // remove deleted Produto from todosProdutos array
             }
         },
-        [todosProdutos],
+        [todosProdutos]
     );
 
     const getCommonEditTextFieldProps = useCallback(
         (
-            cell: MRT_Cell<Produto>,
-        ): MRT_ColumnDef<Produto>['muiTableBodyCellEditTextFieldProps'] => {
+            cell: MRT_Cell<Produto>
+        ): MRT_ColumnDef<Produto>["muiTableBodyCellEditTextFieldProps"] => {
             return {
                 error: !!validationErrors[cell.id],
                 helperText: validationErrors[cell.id],
                 onBlur: (event: any) => {
                     const isValid =
-                        cell.column.id === 'preco'
+                        cell.column.id === "preco"
                             ? validatePreco(event.target.value)
-                            : cell.column.id === 'nome'
-                                ? validateNome(event.target.value)
-                                : validateRequired(event.target.value);
+                            : cell.column.id === "nome"
+                            ? validateNome(event.target.value)
+                            : validateRequired(event.target.value);
                     if (!isValid) {
                         //set validation error for cell if invalid
                         setValidationErrors({
@@ -115,61 +151,61 @@ const Produtos = () => {
                 },
             };
         },
-        [validationErrors],
+        [validationErrors]
     );
 
     const columns = useMemo<MRT_ColumnDef<Produto>[]>(
         () => [
             {
-                accessorKey: 'id',
-                header: 'ID',
+                accessorKey: "id",
+                header: "ID",
                 enableColumnOrdering: false,
                 enableEditing: false, //disable editing on this column
                 enableSorting: false,
                 size: 80,
             },
             {
-                accessorKey: 'nome',
-                header: 'Nome',
+                accessorKey: "nome",
+                header: "Nome",
                 size: 140,
-                muiTableBodyCellEditTextFieldProps: ({cell}: any) => ({
+                muiTableBodyCellEditTextFieldProps: ({ cell }: any) => ({
                     ...getCommonEditTextFieldProps(cell),
                 }),
             },
             {
-                accessorKey: 'descricao',
-                header: 'Descrição',
+                accessorKey: "descricao",
+                header: "Descrição",
                 size: 140,
-                muiTableBodyCellEditTextFieldProps: ({cell}: any) => ({
+                muiTableBodyCellEditTextFieldProps: ({ cell }: any) => ({
                     ...getCommonEditTextFieldProps(cell),
                 }),
             },
             {
-                accessorKey: 'valor_venda',
-                header: 'Preço',
-                muiTableBodyCellEditTextFieldProps: ({cell}: any) => ({
+                accessorKey: "valor_venda",
+                header: "Preço",
+                muiTableBodyCellEditTextFieldProps: ({ cell }: any) => ({
                     ...getCommonEditTextFieldProps(cell),
-                    type: 'number',
+                    type: "number",
                 }),
             },
             {
-                accessorKey: 'categoria.nome',
-                header: 'Categoria',
+                accessorKey: "categoria.nome",
+                header: "Categoria",
                 size: 80,
-                muiTableBodyCellEditTextFieldProps: ({cell}: any) => ({
-                    ...getCommonEditTextFieldProps(cell),
-                }),
+                enableColumnOrdering: false,
+                enableEditing: false, //disable editing on this column
+                enableSorting: false,
             },
             {
-                accessorKey: 'marca.nome',
-                header: 'Marca',
+                accessorKey: "marca.nome",
+                header: "Marca",
                 size: 80,
-                muiTableBodyCellEditTextFieldProps: ({cell}: any) => ({
-                    ...getCommonEditTextFieldProps(cell),
-                }),
+                enableColumnOrdering: false,
+                enableEditing: false, //disable editing on this column
+                enableSorting: false,
             },
         ],
-        [getCommonEditTextFieldProps],
+        [getCommonEditTextFieldProps]
     );
 
     return (
@@ -178,20 +214,20 @@ const Produtos = () => {
                 component="main"
                 sx={{
                     backgroundColor: (theme) =>
-                        theme.palette.mode === 'light'
+                        theme.palette.mode === "light"
                             ? theme.palette.grey[100]
                             : theme.palette.grey[900],
                     flexGrow: 1,
-                    height: '100vh',
-                    overflow: 'auto',
+                    height: "100vh",
+                    overflow: "auto",
                 }}
             >
-                <Toolbar/>
+                <Toolbar />
                 <MaterialReactTable
                     displayColumnDefOptions={{
-                        'mrt-row-actions': {
+                        "mrt-row-actions": {
                             muiTableHeadCellProps: {
-                                align: 'center',
+                                align: "center",
                             },
                             size: 120,
                         },
@@ -201,23 +237,40 @@ const Produtos = () => {
                     editingMode="modal" //default
                     enableEditing
                     onEditingRowSave={handleEditarProduto}
+                    muiToolbarAlertBannerProps={
+                        isError
+                            ? {
+                                  color: "error",
+                                  children: "Error loading data",
+                              }
+                            : undefined
+                    }
                     onEditingRowCancel={handleCancelRowEdits}
-                    renderRowActions={({row, table}) => (
-                        <Box sx={{display: 'flex', gap: '1rem'}}>
+                    renderRowActions={({ row, table }) => (
+                        <Box sx={{ display: "flex", gap: "1rem" }}>
                             <Tooltip arrow placement="left" title="Editar">
-                                <IconButton onClick={() => table.setEditingRow(row)}>
-                                    <Edit/>
+                                <IconButton
+                                    onClick={() => table.setEditingRow(row)}
+                                >
+                                    <Edit />
                                 </IconButton>
                             </Tooltip>
                             <Tooltip arrow placement="right" title="Deletar">
-                                <IconButton color="error" onClick={() => handleDeletarProduto(row)}>
-                                    <Delete/>
+                                <IconButton
+                                    color="error"
+                                    onClick={() => handleDeletarProduto(row)}
+                                >
+                                    <Delete />
                                 </IconButton>
                             </Tooltip>
                             <Tooltip arrow placement="right" title="Imagem">
-                                <Link href={`/produtoImagens/${row.getValue('id')}`}>
+                                <Link
+                                    href={`/produtoImagens/${row.getValue(
+                                        "id"
+                                    )}`}
+                                >
                                     <IconButton color="info">
-                                        <Image/>
+                                        <Image />
                                     </IconButton>
                                 </Link>
                             </Tooltip>
@@ -232,10 +285,15 @@ const Produtos = () => {
                             Adicionar Produto
                         </Button>
                     )}
+                    state={{
+                        isLoading,
+                        showAlertBanner: isError,
+                        showProgressBars: isRefetching,
+                    }}
                 />
-                <Box sx={{display: "flex", gap: "2rem"}}>
-                    <Categorias/>
-                    <Marcas/>
+                <Box sx={{ display: "flex", gap: "2rem" }}>
+                    <Categorias />
+                    <Marcas />
                 </Box>
                 <ModalCriarProduto
                     columns={columns}
@@ -256,23 +314,23 @@ interface CreateModalProps {
 }
 
 export const ModalCriarProduto = ({
-                                      open,
-                                      columns,
-                                      onClose,
-                                      onSubmit,
-                                  }: CreateModalProps) => {
+    open,
+    columns,
+    onClose,
+    onSubmit,
+}: CreateModalProps) => {
     const [values, setValues] = useState<any>(() =>
         columns.reduce((acc, column) => {
-            acc[column.accessorKey ?? ''] = '';
+            acc[column.accessorKey ?? ""] = "";
             return acc;
-        }, {} as any),
+        }, {} as any)
     );
-    const [selectedCategoria, setSelectedCategoria] = useState('');
-    const [selectedMarca, setSelectedMarca] = useState('');
+    const [selectedCategoria, setSelectedCategoria] = useState("");
+    const [selectedMarca, setSelectedMarca] = useState("");
     const [todasCategorias, setTodasCategorias] = useState<Categoria[]>([]);
     const [todasMarcas, setTodasMarcas] = useState<Marca[]>([]);
-    const categoriaService = new CategoriaService()
-    const marcaService = new MarcaService()
+    const categoriaService = new CategoriaService();
+    const marcaService = new MarcaService();
 
     useEffect(() => {
         marcaService.findAll().then((r) => setTodasMarcas(r.data));
@@ -282,8 +340,8 @@ export const ModalCriarProduto = ({
     const handleSubmit = () => {
         const valuesWithSelections = {
             ...values,
-            categoria: {id: selectedCategoria},
-            marca: {id: selectedMarca},
+            categoria: { id: selectedCategoria },
+            marca: { id: selectedMarca },
         };
         onSubmit(valuesWithSelections);
         onClose();
@@ -296,40 +354,59 @@ export const ModalCriarProduto = ({
                 <form onSubmit={(e) => e.preventDefault()}>
                     <Stack
                         sx={{
-                            width: '100%',
-                            minWidth: {xs: '300px', sm: '360px', md: '400px'},
-                            gap: '1.5rem',
+                            width: "100%",
+                            minWidth: { xs: "300px", sm: "360px", md: "400px" },
+                            gap: "1.5rem",
                         }}
                     >
-                        {columns.map((column) => (
-                            column.accessorKey === 'categoria.nome' ? (
+                        {columns.map((column) =>
+                            column.accessorKey === "categoria.nome" ? (
                                 <FormControl fullWidth>
-                                    <InputLabel id="categoriaLabel">Categoria</InputLabel>
+                                    <InputLabel id="categoriaLabel">
+                                        Categoria
+                                    </InputLabel>
                                     <Select
                                         labelId="categoriaLabel"
                                         id="label"
                                         value={selectedCategoria}
                                         label="Categoria"
-                                        onChange={(event) => setSelectedCategoria(event.target.value)}
+                                        onChange={(event) =>
+                                            setSelectedCategoria(
+                                                event.target.value
+                                            )
+                                        }
                                     >
                                         {todasCategorias.map((categoria) => (
-                                            <MenuItem value={categoria.id}
-                                                      key={categoria.id}>{categoria.nome}</MenuItem>
+                                            <MenuItem
+                                                value={categoria.id}
+                                                key={categoria.id}
+                                            >
+                                                {categoria.nome}
+                                            </MenuItem>
                                         ))}
                                     </Select>
                                 </FormControl>
-                            ) : column.accessorKey === 'marca.nome' ? (
+                            ) : column.accessorKey === "marca.nome" ? (
                                 <FormControl fullWidth>
-                                    <InputLabel id="marcaLabel">Marca</InputLabel>
+                                    <InputLabel id="marcaLabel">
+                                        Marca
+                                    </InputLabel>
                                     <Select
                                         labelId="marcaLabel"
                                         id="marca"
                                         value={selectedMarca}
                                         label="Marca"
-                                        onChange={(event) => setSelectedMarca(event.target.value)}
+                                        onChange={(event) =>
+                                            setSelectedMarca(event.target.value)
+                                        }
                                     >
                                         {todasMarcas.map((marca) => (
-                                            <MenuItem value={marca.id} key={marca.id}>{marca.nome}</MenuItem>
+                                            <MenuItem
+                                                value={marca.id}
+                                                key={marca.id}
+                                            >
+                                                {marca.nome}
+                                            </MenuItem>
                                         ))}
                                     </Select>
                                 </FormControl>
@@ -339,33 +416,58 @@ export const ModalCriarProduto = ({
                                     label={column.header}
                                     name={column.accessorKey}
                                     InputProps={
-                                        column.accessorKey === 'valor_venda' ?
-                                            {startAdornment: <InputAdornment position="start">$</InputAdornment>} :
-                                            {}
+                                        column.accessorKey === "valor_venda"
+                                            ? {
+                                                  startAdornment: (
+                                                      <InputAdornment position="start">
+                                                          $
+                                                      </InputAdornment>
+                                                  ),
+                                              }
+                                            : {}
                                     }
-                                    type={column.accessorKey === 'valor_venda' ? 'number' : 'text'}
-                                    onChange={(e) => setValues({
-                                        ...values,
-                                        [e.target.name]: e.target.value
-                                    })}
+                                    inputProps={{
+                                        step: 0.1,
+                                    }}
+                                    type={
+                                        column.accessorKey === "valor_venda"
+                                            ? "number"
+                                            : "text"
+                                    }
+                                    onChange={(e) =>
+                                        setValues({
+                                            ...values,
+                                            [e.target.name]: e.target.value,
+                                        })
+                                    }
                                     onKeyPress={(e) => {
-                                        if (column.accessorKey === 'valor_venda') {
-                                            const inputChar = String.fromCharCode(e.charCode);
-                                            if (!/^\d+$/.test(inputChar)) {  // check if keystroke is a numeric character
-                                                e.preventDefault();  // prevent the keystroke from being entered
+                                        if (
+                                            column.accessorKey === "valor_venda"
+                                        ) {
+                                            const inputChar =
+                                                String.fromCharCode(e.charCode);
+                                            if (!/^\d+$/.test(inputChar)) {
+                                                // check if keystroke is a numeric character
+                                                e.preventDefault(); // prevent the keystroke from being entered
                                             }
                                         }
                                     }}
-                                    disabled={column.accessorKey === 'id'}
+                                    disabled={column.accessorKey === "id"}
                                 />
                             )
-                        ))}
+                        )}
                     </Stack>
                 </form>
             </DialogContent>
-            <DialogActions sx={{p: '1.25rem'}}>
+            <DialogActions sx={{ p: "1.25rem" }}>
                 <Button onClick={onClose}>Cancel</Button>
-                <Button color="secondary" onClick={handleSubmit} variant="contained">Adicionar Produto</Button>
+                <Button
+                    color="secondary"
+                    onClick={handleSubmit}
+                    variant="contained"
+                >
+                    Adicionar Produto
+                </Button>
             </DialogActions>
         </Dialog>
     );

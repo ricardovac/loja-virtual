@@ -32,7 +32,7 @@ export class ProdutoService {
             .then(res => res)
     }
 
-    async edit(objeto: Produto) {
+    async edit(objeto: any) {
         return axios.put(this.url + "/produto/", objeto)
             .then(res => res)
     }
