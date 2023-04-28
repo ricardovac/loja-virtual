@@ -54,12 +54,20 @@ export const mainListItems = (
                 <ListItemText primary="Pessoas" />
             </ListItemButton>
         </Link>
-        <ListItemButton>
-            <ListItemIcon>
-                <Lock />
-            </ListItemIcon>
-            <ListItemText primary="Permissões" />
-        </ListItemButton>
+        <Link
+            href="/permissoes"
+            underline={"none"}
+            color={(theme) =>
+                theme.palette.mode === "light" ? "black" : "white"
+            }
+        >
+            <ListItemButton>
+                <ListItemIcon>
+                    <Lock />
+                </ListItemIcon>
+                <ListItemText primary="Permissões" />
+            </ListItemButton>
+        </Link>
         <ListItemButton>
             <ListItemIcon>
                 <LocationCity />

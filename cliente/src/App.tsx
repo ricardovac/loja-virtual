@@ -6,6 +6,7 @@ import Dashboard from "./pages/dashboard/Dashboard";
 import { QueryClient, QueryClientProvider } from "react-query";
 import ProdutoImagens from "./pages/produtos/ProdutoImagens";
 import Pessoas from "./pages/pessoas/Pessoas";
+import Permissoes from "./pages/permissoes/Permissoes";
 
 const router = createBrowserRouter([
     {
@@ -23,6 +24,10 @@ const router = createBrowserRouter([
     {
         path: "/pessoas/",
         element: <Pessoas />,
+    },
+    {
+        path: "/permissoes/",
+        element: <Permissoes />,
     },
 ]);
 
