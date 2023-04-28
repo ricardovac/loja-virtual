@@ -16,7 +16,7 @@ import MaterialReactTable, {
     type MRT_ColumnDef,
     type MRT_Row,
 } from "material-react-table";
-import { Delete, Edit } from "@mui/icons-material";
+import { Delete } from "@mui/icons-material";
 import Toolbar from "@mui/material/Toolbar";
 import { Pessoa, PessoaService } from "../../services/PessoaService";
 import {

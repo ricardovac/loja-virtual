@@ -1,38 +1,38 @@
-import * as React from 'react';
+import * as React from "react";
 import Layout from "./components/layout/Layout";
-import {createBrowserRouter, RouterProvider} from "react-router-dom";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Produtos from "./pages/produtos/Produtos";
 import Dashboard from "./pages/dashboard/Dashboard";
-import {QueryClient, QueryClientProvider} from "react-query";
+import { QueryClient, QueryClientProvider } from "react-query";
 import ProdutoImagens from "./pages/produtos/ProdutoImagens";
 import Pessoas from "./pages/pessoas/Pessoas";
 
 const router = createBrowserRouter([
     {
         path: "/",
-        element: <Dashboard/>
+        element: <Dashboard />,
     },
     {
         path: "/produtos/",
-        element: <Produtos/>,
+        element: <Produtos />,
     },
     {
         path: "/produtoImagens/:id",
-        element: <ProdutoImagens/>,
+        element: <ProdutoImagens />,
     },
     {
         path: "/pessoas/",
-        element: <Pessoas/>
-    }
+        element: <Pessoas />,
+    },
 ]);
 
-const queryClient = new QueryClient()
+const queryClient = new QueryClient();
 
 export default function App() {
     return (
         <QueryClientProvider client={queryClient}>
             <Layout>
-                <RouterProvider router={router}/>
+                <RouterProvider router={router} />
             </Layout>
         </QueryClientProvider>
     );

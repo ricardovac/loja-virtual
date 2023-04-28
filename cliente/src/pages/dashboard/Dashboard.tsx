@@ -1,57 +1,58 @@
-import * as React from 'react';
-import {createTheme, ThemeProvider} from '@mui/material/styles';
-import Box from '@mui/material/Box';
-import Toolbar from '@mui/material/Toolbar';
-import Container from '@mui/material/Container';
-import Grid from '@mui/material/Grid';
-import Paper from '@mui/material/Paper';
-import Chart from './Chart';
-import Orders from './Orders';
-
-const mdTheme = createTheme();
+import * as React from "react";
+import Box from "@mui/material/Box";
+import Toolbar from "@mui/material/Toolbar";
+import Container from "@mui/material/Container";
+import Grid from "@mui/material/Grid";
+import Paper from "@mui/material/Paper";
+import Chart from "./Chart";
+import Orders from "./Orders";
 
 function DashboardContent() {
     return (
-        <ThemeProvider theme={mdTheme}>
-            <Box
-                component="main"
-                sx={{
-                    backgroundColor: (theme) =>
-                        theme.palette.mode === 'light'
-                            ? theme.palette.grey[100]
-                            : theme.palette.grey[900],
-                    flexGrow: 1,
-                    height: '100vh',
-                    overflow: 'auto',
-                }}
-            >
-                <Toolbar/>
-                <Container maxWidth="lg" sx={{mt: 4, mb: 4}}>
-                    <Grid container spacing={3}>
-                        <Grid item xs={12} md={8} lg={9}>
-                            <Paper
-                                sx={{
-                                    p: 2,
-                                    display: 'flex',
-                                    flexDirection: 'column',
-                                    height: 240,
-                                }}
-                            >
-                                <Chart/>
-                            </Paper>
-                        </Grid>
-                        <Grid item xs={12}>
-                            <Paper sx={{p: 2, display: 'flex', flexDirection: 'column'}}>
-                                <Orders/>
-                            </Paper>
-                        </Grid>
+        <Box
+            component="main"
+            sx={{
+                backgroundColor: (theme) =>
+                    theme.palette.mode === "light"
+                        ? theme.palette.grey[100]
+                        : theme.palette.grey[900],
+                flexGrow: 1,
+                height: "100vh",
+                overflow: "auto",
+            }}
+        >
+            <Toolbar />
+            <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
+                <Grid container spacing={3}>
+                    <Grid item xs={12} md={8} lg={9}>
+                        <Paper
+                            sx={{
+                                p: 2,
+                                display: "flex",
+                                flexDirection: "column",
+                                height: 240,
+                            }}
+                        >
+                            <Chart />
+                        </Paper>
                     </Grid>
-                </Container>
-            </Box>
-        </ThemeProvider>
+                    <Grid item xs={12}>
+                        <Paper
+                            sx={{
+                                p: 2,
+                                display: "flex",
+                                flexDirection: "column",
+                            }}
+                        >
+                            <Orders />
+                        </Paper>
+                    </Grid>
+                </Grid>
+            </Container>
+        </Box>
     );
 }
 
 export default function Dashboard() {
-    return <DashboardContent/>;
+    return <DashboardContent />;
 }

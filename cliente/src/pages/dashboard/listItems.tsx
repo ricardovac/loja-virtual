@@ -1,58 +1,76 @@
-import * as React from 'react';
-import ListItemButton from '@mui/material/ListItemButton';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import ListItemText from '@mui/material/ListItemText';
-import ListSubheader from '@mui/material/ListSubheader';
-import DashboardIcon from '@mui/icons-material/Dashboard';
-import PeopleIcon from '@mui/icons-material/People';
-import AssignmentIcon from '@mui/icons-material/Assignment';
-import Inventory from '@mui/icons-material/Inventory';
+import * as React from "react";
+import ListItemButton from "@mui/material/ListItemButton";
+import ListItemIcon from "@mui/material/ListItemIcon";
+import ListItemText from "@mui/material/ListItemText";
+import ListSubheader from "@mui/material/ListSubheader";
+import DashboardIcon from "@mui/icons-material/Dashboard";
+import PeopleIcon from "@mui/icons-material/People";
+import AssignmentIcon from "@mui/icons-material/Assignment";
+import Inventory from "@mui/icons-material/Inventory";
 import Link from "@mui/material/Link";
-import {LocationCity, Lock, Place} from "@mui/icons-material";
+import { LocationCity, Lock, Place } from "@mui/icons-material";
 
 export const mainListItems = (
     <React.Fragment>
-        <Link href="/" underline={"none"} color={"black"}>
+        <Link
+            href="/"
+            underline={"none"}
+            color={(theme) =>
+                theme.palette.mode === "light" ? "black" : "white"
+            }
+        >
             <ListItemButton>
                 <ListItemIcon>
-                    <DashboardIcon/>
+                    <DashboardIcon />
                 </ListItemIcon>
-                <ListItemText primary="Dashboard"/>
+                <ListItemText primary="Dashboard" />
             </ListItemButton>
         </Link>
-        <Link href="/produtos" underline={"none"} color={"black"}>
+        <Link
+            href="/produtos"
+            underline={"none"}
+            color={(theme) =>
+                theme.palette.mode === "light" ? "black" : "white"
+            }
+        >
             <ListItemButton>
                 <ListItemIcon>
-                    <Inventory/>
+                    <Inventory />
                 </ListItemIcon>
-                <ListItemText primary="Produtos"/>
+                <ListItemText primary="Produtos" />
             </ListItemButton>
         </Link>
-        <Link href="/pessoas" underline={"none"} color={"black"}>
+        <Link
+            href="/pessoas"
+            underline={"none"}
+            color={(theme) =>
+                theme.palette.mode === "light" ? "black" : "white"
+            }
+        >
             <ListItemButton>
                 <ListItemIcon>
-                    <PeopleIcon/>
+                    <PeopleIcon />
                 </ListItemIcon>
-                <ListItemText primary="Pessoas"/>
+                <ListItemText primary="Pessoas" />
             </ListItemButton>
         </Link>
         <ListItemButton>
             <ListItemIcon>
-                <Lock/>
+                <Lock />
             </ListItemIcon>
-            <ListItemText primary="Permissões"/>
+            <ListItemText primary="Permissões" />
         </ListItemButton>
         <ListItemButton>
             <ListItemIcon>
-                <LocationCity/>
+                <LocationCity />
             </ListItemIcon>
-            <ListItemText primary="Cidades"/>
+            <ListItemText primary="Cidades" />
         </ListItemButton>
         <ListItemButton>
             <ListItemIcon>
-                <Place/>
+                <Place />
             </ListItemIcon>
-            <ListItemText primary="Estados"/>
+            <ListItemText primary="Estados" />
         </ListItemButton>
     </React.Fragment>
 );
@@ -64,21 +82,21 @@ export const secondaryListItems = (
         </ListSubheader>
         <ListItemButton>
             <ListItemIcon>
-                <AssignmentIcon/>
+                <AssignmentIcon />
             </ListItemIcon>
-            <ListItemText primary="Mês atual"/>
+            <ListItemText primary="Mês atual" />
         </ListItemButton>
         <ListItemButton>
             <ListItemIcon>
-                <AssignmentIcon/>
+                <AssignmentIcon />
             </ListItemIcon>
-            <ListItemText primary="Ultimos 6 Mêses"/>
+            <ListItemText primary="Ultimos 6 Mêses" />
         </ListItemButton>
         <ListItemButton>
             <ListItemIcon>
-                <AssignmentIcon/>
+                <AssignmentIcon />
             </ListItemIcon>
-            <ListItemText primary="Todo Ano"/>
+            <ListItemText primary="Todo Ano" />
         </ListItemButton>
     </React.Fragment>
 );
