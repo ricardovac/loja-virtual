@@ -68,18 +68,34 @@ export const mainListItems = (
                 <ListItemText primary="Permissões" />
             </ListItemButton>
         </Link>
-        <ListItemButton>
-            <ListItemIcon>
-                <LocationCity />
-            </ListItemIcon>
-            <ListItemText primary="Cidades" />
-        </ListItemButton>
-        <ListItemButton>
-            <ListItemIcon>
-                <Place />
-            </ListItemIcon>
-            <ListItemText primary="Estados" />
-        </ListItemButton>
+        <Link
+            href="/estados"
+            underline={"none"}
+            color={(theme) =>
+                theme.palette.mode === "light" ? "black" : "white"
+            }
+        >
+            <ListItemButton>
+                <ListItemIcon>
+                    <Place />
+                </ListItemIcon>
+                <ListItemText primary="Estados" />
+            </ListItemButton>
+        </Link>
+        <Link
+            href="/cidades"
+            underline={"none"}
+            color={(theme) =>
+                theme.palette.mode === "light" ? "black" : "white"
+            }
+        >
+            <ListItemButton>
+                <ListItemIcon>
+                    <LocationCity />
+                </ListItemIcon>
+                <ListItemText primary="Cidades" />
+            </ListItemButton>
+        </Link>
     </React.Fragment>
 );
 

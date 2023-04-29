@@ -40,8 +40,12 @@ import { ConstructionSharp, LocalTaxiOutlined } from "@mui/icons-material";
 const Produtos = () => {
     const [createModalOpen, setCreateModalOpen] = useState(false);
     const [todosProdutos, setTodosProdutos] = useState<Produto[]>([]);
+    const [todasCategorias, setTodasCategorias] = useState<Produto[]>([]);
+    const [todasMarcas, setTodasMarcas] = useState<Produto[]>([]);
     const [isError, setIsError] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
+    const [selectedMarca, setSelectedMarca] = useState("");
+    const [selectedCategoria, setSelectedCategoria] = useState("");
     const [isRefetching, setIsRefetching] = useState(true);
     const [validationErrors, setValidationErrors] = useState<{
         [cellId: string]: string;
@@ -53,6 +57,8 @@ const Produtos = () => {
     const fetchData = () => {
         try {
             produtoService.findAll().then((r) => setTodosProdutos(r.data));
+            marcaService.findAll().then((r) => setTodasMarcas(r.data));
+            categoriaService.findAll().then((r) => setTodasCategorias(r.data));
         } catch (e) {
             setIsError(true);
             console.error(e);

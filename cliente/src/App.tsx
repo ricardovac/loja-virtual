@@ -7,6 +7,8 @@ import { QueryClient, QueryClientProvider } from "react-query";
 import ProdutoImagens from "./pages/produtos/ProdutoImagens";
 import Pessoas from "./pages/pessoas/Pessoas";
 import Permissoes from "./pages/permissoes/Permissoes";
+import Estados from "./pages/cidade_estado/Estados";
+import Cidade from "./pages/cidade_estado/Cidades";
 
 const router = createBrowserRouter([
     {
@@ -28,6 +30,14 @@ const router = createBrowserRouter([
     {
         path: "/permissoes/",
         element: <Permissoes />,
+    },
+    {
+        path: "/estados",
+        element: <Estados />,
+    },
+    {
+        path: "/cidades",
+        element: <Cidade />,
     },
 ]);
 
