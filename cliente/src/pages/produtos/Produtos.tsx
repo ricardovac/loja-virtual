@@ -89,12 +89,19 @@ const Produtos = () => {
     const handleEditarProduto: MaterialReactTableProps<Produto>["onEditingRowSave"] =
         async ({ exitEditingMode, row, values }) => {
             if (!Object.keys(validationErrors).length) {
-                const originalProduto = row.original;
-                const updatedProduto = {
-                    ...originalProduto,
+                const updatedProduto: Produto = {
+                    id: row.original.id,
                     nome: values.nome,
                     descricao: values.descricao,
                     valor_venda: values.valor_venda,
+                    categoria: {
+                        id: Number(selectedCategoria),
+                        nome: "",
+                    },
+                    marca: {
+                        id: Number(selectedMarca),
+                        nome: "",
+                    },
                 };
                 const response = await produtoService.edit(updatedProduto);
                 todosProdutos[row.index] = response.data; // update edited Produto in todosProdutos array
@@ -197,21 +204,35 @@ const Produtos = () => {
             {
                 accessorKey: "categoria.nome",
                 header: "Categoria",
-                size: 80,
-                enableColumnOrdering: false,
-                enableEditing: false, //disable editing on this column
-                enableSorting: false,
+                muiTableBodyCellEditTextFieldProps: {
+                    select: true, //change to select for a dropdown
+                    onBlur: (e) => {
+                        setSelectedCategoria(e.target.value);
+                    },
+                    children: todasCategorias.map((categoria) => (
+                        <MenuItem key={categoria.id} value={categoria.id}>
+                            {categoria.nome}
+                        </MenuItem>
+                    )),
+                },
             },
             {
                 accessorKey: "marca.nome",
                 header: "Marca",
-                size: 80,
-                enableColumnOrdering: false,
-                enableEditing: false, //disable editing on this column
-                enableSorting: false,
+                muiTableBodyCellEditTextFieldProps: {
+                    select: true, //change to select for a dropdown
+                    onBlur: (e) => {
+                        setSelectedMarca(e.target.value);
+                    },
+                    children: todasMarcas.map((marca) => (
+                        <MenuItem key={marca.id} value={marca.id}>
+                            {marca.nome}
+                        </MenuItem>
+                    )),
+                },
             },
         ],
-        [getCommonEditTextFieldProps]
+        [getCommonEditTextFieldProps, todasCategorias, todasMarcas]
     );
 
     return (
