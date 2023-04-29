@@ -16,7 +16,7 @@ import MaterialReactTable, {
     type MRT_ColumnDef,
     type MRT_Row,
 } from "material-react-table";
-import { Delete } from "@mui/icons-material";
+import { Delete, Edit } from "@mui/icons-material";
 import Toolbar from "@mui/material/Toolbar";
 import { Pessoa, PessoaService } from "../../services/PessoaService";
 import {
@@ -35,7 +35,9 @@ import { Permissao, PermissaoService } from "../../services/PermissaoService";
 
 const Pessoas = () => {
     const [createModalOpen, setCreateModalOpen] = useState(false);
-    const [allPessoa, setAllPessoa] = useState<Pessoa[]>([]);
+    const [todasPessoas, setTodasPessoas] = useState<Pessoa[]>([]);
+    const [todasCidades, setTodasCidades] = useState<Cidade[]>([]);
+    const [selectedCidade, setSelectedCidade] = useState("");
     const [isError, setIsError] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
     const [isRefetching, setIsRefetching] = useState(true);
@@ -43,13 +45,15 @@ const Pessoas = () => {
         [cellId: string]: string;
     }>({});
     const pessoaService = new PessoaService();
+    const cidadeService = new CidadeService();
 
     const fetchData = () => {
         setIsLoading(true);
         setIsRefetching(true);
 
         try {
-            pessoaService.findAll().then((r) => setAllPessoa(r.data));
+            pessoaService.findAll().then((r) => setTodasPessoas(r.data));
+            cidadeService.findAll().then((r) => setTodasCidades(r.data));
         } catch (e) {
             setIsError(true);
             console.error(e);
@@ -66,20 +70,44 @@ const Pessoas = () => {
 
     const handleCriarPessoa = async (values: Pessoa) => {
         const response = await pessoaService.create(values);
-        if (response.status == 200) {
-            setAllPessoa(response.data);
-            setCreateModalOpen(false); // close the create modal
+        try {
+            if (response.status == 200) {
+                setTodasPessoas(response.data);
+                setCreateModalOpen(false); // close the create modal
+            }
+        } finally {
+            window.location.reload();
         }
     };
 
     const handleSaveRowEdits: MaterialReactTableProps<Pessoa>["onEditingRowSave"] =
         async ({ exitEditingMode, row, values }) => {
             if (!Object.keys(validationErrors).length) {
+                const updatedPessoa: Pessoa = {
+                    id: row.original.id,
+                    nome: values.nome,
+                    cidade: {
+                        id: Number(selectedCidade),
+                        nome: "",
+                    },
+                    cpf: values.cpf,
+                    email: values.email,
+                    endereco: values.endereco,
+                    cep: values.cep,
+                    permissaoPessoas: row.original.permissaoPessoas.map(
+                        (permissaoPessoa: any) => ({
+                            permissao: {
+                                id: permissaoPessoa.permissao.id,
+                                nome: permissaoPessoa.permissao.nome,
+                            },
+                        })
+                    ),
+                };
                 //send/receive api updates here, then refetch or update local table data for re-render
-                const response = await pessoaService.edit(values);
+                const response = await pessoaService.edit(updatedPessoa);
                 if (response.status == 200) {
-                    allPessoa[row.index] = response.data;
-                    setAllPessoa([...allPessoa]);
+                    todasPessoas[row.index] = response.data;
+                    setTodasPessoas([...todasPessoas]);
                     exitEditingMode(); //required to exit editing mode and close modal
                 }
             }
@@ -100,12 +128,12 @@ const Pessoas = () => {
             }
             const response = await pessoaService.delete(row.getValue("id"));
             if (response.status == 200) {
-                setAllPessoa(
-                    allPessoa.filter((p) => p.id !== row.getValue("id"))
+                setTodasPessoas(
+                    todasPessoas.filter((p) => p.id !== row.getValue("id"))
                 );
             }
         },
-        [allPessoa]
+        [todasPessoas]
     );
 
     const getCommonEditTextFieldProps = useCallback(
@@ -117,9 +145,9 @@ const Pessoas = () => {
                 helperText: validationErrors[cell.id],
                 onBlur: (event: any) => {
                     const isValid =
-                        cell.column.id === "nome"
-                            ? validateNome(event.target.value)
-                            : validateRequired(event.target.value);
+                        cell.column.id === "cidade.nome"
+                            ? validateRequired(event.target.value)
+                            : validateNome(event.target.value);
                     if (!isValid) {
                         //set validation error for cell if invalid
                         setValidationErrors({
@@ -160,10 +188,17 @@ const Pessoas = () => {
             {
                 accessorKey: "cidade.nome",
                 header: "Cidade",
-                size: 140,
-                muiTableBodyCellEditTextFieldProps: ({ cell }: any) => ({
-                    ...getCommonEditTextFieldProps(cell),
-                }),
+                muiTableBodyCellEditTextFieldProps: {
+                    select: true, //change to select for a dropdown
+                    onBlur: (e) => {
+                        setSelectedCidade(e.target.value);
+                    },
+                    children: todasCidades.map((cidades) => (
+                        <MenuItem key={cidades.id} value={cidades.id}>
+                            {cidades.nome}
+                        </MenuItem>
+                    )),
+                },
             },
             {
                 accessorKey: "cpf",
@@ -205,7 +240,7 @@ const Pessoas = () => {
                     {
                         accessorFn: (row) =>
                             `${row.permissaoPessoas.map(
-                                (r) => r.permissao.nome
+                                (r: any) => r.permissao.nome
                             )}`, //accessorFn used to join multiple data into a single cell
                         id: "permissoesPessoas", //id is still required when using accessorFn instead of accessorKey
                         header: "Permissões",
@@ -213,22 +248,11 @@ const Pessoas = () => {
                         enableEditing: false, //disable editing on this column
                         enableSorting: false,
                         size: 250,
-                        Cell: ({ renderedCellValue, row }) => (
-                            <Box
-                                sx={{
-                                    display: "flex",
-                                    alignItems: "center",
-                                    gap: "1rem",
-                                }}
-                            >
-                                <span>{renderedCellValue}</span>
-                            </Box>
-                        ),
                     },
                 ],
             },
         ],
-        [getCommonEditTextFieldProps]
+        [getCommonEditTextFieldProps, todasCidades]
     );
 
     return (
@@ -256,13 +280,20 @@ const Pessoas = () => {
                         },
                     }}
                     columns={columns}
-                    data={allPessoa}
+                    data={todasPessoas}
                     editingMode="modal" //default
                     enableEditing
                     onEditingRowSave={handleSaveRowEdits}
                     onEditingRowCancel={handleCancelRowEdits}
                     renderRowActions={({ row, table }) => (
                         <Box sx={{ display: "flex", gap: "1rem" }}>
+                            <Tooltip arrow placement="left" title="Editar">
+                                <IconButton
+                                    onClick={() => table.setEditingRow(row)}
+                                >
+                                    <Edit />
+                                </IconButton>
+                            </Tooltip>
                             <Tooltip arrow placement="right" title="Delete">
                                 <IconButton
                                     color="error"
@@ -374,13 +405,14 @@ export const ModalCriarPessoa = ({
                     >
                         {columns.map((column) =>
                             column.accessorKey == "cidade.nome" ? (
-                                <FormControl fullWidth>
+                                <FormControl fullWidth key={column.accessorKey}>
                                     <InputLabel id="cidadeLabel">
                                         Cidade
                                     </InputLabel>
                                     <Select
                                         labelId="cidadeLabel"
                                         id="cidade"
+                                        key={column.accessorKey}
                                         value={selectedCidade}
                                         label="Cidade"
                                         onChange={(event) =>
@@ -429,6 +461,7 @@ export const ModalCriarPessoa = ({
                                 <FormControl
                                     component="fieldset"
                                     variant="standard"
+                                    key={column.accessorKey}
                                 >
                                     <FormLabel component="legend">
                                         Permissões

@@ -25,7 +25,7 @@ import { Estado, EstadoService } from "../../services/EstadoService";
 const Cidades = () => {
     const [createModalOpen, setCreateModalOpen] = useState(false);
     const [todasCidades, setTodasCidades] = useState<Cidade[]>([]);
-    const [todosEstados, setTodosEstados] = useState<Cidade[]>([]);
+    const [todosEstados, setTodosEstados] = useState<Estado[]>([]);
     const [selectedEstado, setSelectedEstado] = useState("");
     const [isError, setIsError] = useState(false);
     const [isLoading, setIsLoading] = useState(true);

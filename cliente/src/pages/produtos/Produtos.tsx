@@ -33,15 +33,14 @@ import { Marca, MarcaService } from "../../services/MarcaService";
 import Categorias from "./Categorias";
 import Marcas from "./Marcas";
 import Link from "@mui/material/Link";
-import { ConstructionSharp, LocalTaxiOutlined } from "@mui/icons-material";
 
 // FIX: Fazer a selection box para a edição de produtos.
 // FIX: re-render na categoria e marca na criação de produtos.
 const Produtos = () => {
     const [createModalOpen, setCreateModalOpen] = useState(false);
     const [todosProdutos, setTodosProdutos] = useState<Produto[]>([]);
-    const [todasCategorias, setTodasCategorias] = useState<Produto[]>([]);
-    const [todasMarcas, setTodasMarcas] = useState<Produto[]>([]);
+    const [todasCategorias, setTodasCategorias] = useState<Categoria[]>([]);
+    const [todasMarcas, setTodasMarcas] = useState<Marca[]>([]);
     const [isError, setIsError] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
     const [selectedMarca, setSelectedMarca] = useState("");
@@ -441,6 +440,7 @@ export const ModalCriarProduto = ({
                                 <TextField
                                     key={column.accessorKey}
                                     label={column.header}
+                                    minRows={0}
                                     name={column.accessorKey}
                                     InputProps={
                                         column.accessorKey === "valor_venda"
@@ -453,9 +453,6 @@ export const ModalCriarProduto = ({
                                               }
                                             : {}
                                     }
-                                    inputProps={{
-                                        step: 0.1,
-                                    }}
                                     type={
                                         column.accessorKey === "valor_venda"
                                             ? "number"
