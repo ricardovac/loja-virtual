@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import org.hibernate.Hibernate;
+import org.hibernate.annotations.GenericGenerator;
 
 import java.util.Date;
 import java.util.Objects;
@@ -17,8 +18,9 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class ProdutoImagens {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
+    @GeneratedValue(generator = "uuid")
+    @GenericGenerator(name = "uuid", strategy = "uuid2")
+    private String id;
 
     private String nome;
 
@@ -26,19 +28,24 @@ public class ProdutoImagens {
     @JoinColumn(name = "idProduto") // Alterar o nome da coluna
     private Produto produto;
 
+    private String tipo;
+
+    @Lob
+    @Column(length = 100000)
+    private byte[] arquivo;
+
     @Temporal(TemporalType.TIMESTAMP)
     private Date dataCriacao;
 
     @Temporal(TemporalType.TIMESTAMP)
     private Date dataAtualizacao;
 
-    @Transient
-    private byte[] arquivo;
-
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
+        if (this == o)
+            return true;
+        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o))
+            return false;
         ProdutoImagens that = (ProdutoImagens) o;
         return getId() != null && Objects.equals(getId(), that.getId());
     }

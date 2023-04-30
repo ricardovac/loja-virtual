@@ -31,6 +31,10 @@ public class Produto {
     @Temporal(TemporalType.TIMESTAMP)
     private Date dataAtualizacao;
 
+    @Lob
+    @Column(length = 100000)
+    private byte[] arquivo;
+
     // Uma marca pode ter muitos produtos
     @ManyToOne
     @JoinColumn(name = "idMarca")
@@ -42,8 +46,10 @@ public class Produto {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
+        if (this == o)
+            return true;
+        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o))
+            return false;
         Produto produto = (Produto) o;
         return getId() != null && Objects.equals(getId(), produto.getId());
     }

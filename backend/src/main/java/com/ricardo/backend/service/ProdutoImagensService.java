@@ -19,7 +19,7 @@ import java.nio.file.Paths;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
+import java.util.stream.Stream;
 
 @Service
 public class ProdutoImagensService {
@@ -29,11 +29,15 @@ public class ProdutoImagensService {
     @Autowired
     private ProdutoRepository produtoRepository;
 
-    public List<ProdutoImagens> listarTodosProdutoImagens() {
-        return produtoImagensRepository.findAll();
+    public Stream<ProdutoImagens> listarTodosProdutoImagens() {
+        return produtoImagensRepository.findAll().stream();
     }
 
-    public List<ProdutoImagens> buscarPorProduto(Long idProduto) {
+    public ProdutoImagens buscarArquivo(String id) {
+        return produtoImagensRepository.findById(id).get();
+    }
+
+    public List<ProdutoImagens> buscarPorProduto(String idProduto) {
         List<ProdutoImagens> listaProdutoImagens = produtoImagensRepository.findByProdutoId(idProduto);
 
         for (ProdutoImagens produtoImagens : listaProdutoImagens) {
@@ -47,21 +51,23 @@ public class ProdutoImagensService {
         return listaProdutoImagens;
     }
 
-    public ProdutoImagens inserirProdutoImagens(Long idProduto, MultipartFile file) {
+    public ProdutoImagens inserirProdutoImagens(Long idProduto, MultipartFile file) throws IOException {
         // Acha o produto por Id.
         Produto produto = produtoRepository.findById(idProduto).orElse(null);
         // Coloca o nome
+        String fileName = StringUtils.cleanPath(file.getOriginalFilename());
         ProdutoImagens produtoImagens = new ProdutoImagens();
-        String imageName = UUID.randomUUID() + "." + StringUtils.getFilenameExtension(file.getOriginalFilename());
 
         try {
             if (!file.isEmpty()) {
                 byte[] bytes = file.getBytes();
                 assert produto != null;
-//                String nomeImagem = produto.getId() + file.getOriginalFilename();
-                Path caminho = Paths.get(imagePath + imageName);
+                // String nomeImagem = produto.getId() + file.getOriginalFilename();
+                Path caminho = Paths.get(imagePath + fileName);
                 Files.write(caminho, bytes);
-                produtoImagens.setNome(imageName);
+                produtoImagens.setNome(fileName);
+                produtoImagens.setTipo(file.getContentType());
+                produto.setArquivo(file.getBytes());
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -69,22 +75,10 @@ public class ProdutoImagensService {
 
         produtoImagens.setProduto(produto);
         produtoImagens.setDataCriacao(new Date());
-        produtoImagens = produtoImagensRepository.saveAndFlush(produtoImagens);
-        return produtoImagens;
+        return produtoImagensRepository.save(produtoImagens);
     }
 
-    public ProdutoImagens alterarProdutoImagens(ProdutoImagens produtoImagens) {
-        Optional<ProdutoImagens> produtoImagensExistente = produtoImagensRepository.findById(produtoImagens.getId());
-        if (produtoImagensExistente.isPresent()) {
-            produtoImagens.setDataCriacao(produtoImagensExistente.get().getDataCriacao()); // Mantém a data de criação existente
-        } else {
-            produtoImagens.setDataCriacao(new Date()); // Define uma nova data de criação
-        }
-        produtoImagens.setDataAtualizacao(new Date()); // Define a nova data de atualização
-        return produtoImagensRepository.saveAndFlush(produtoImagens);
-    }
-
-    public void excluirProdutoImagens(Long id) {
+    public void excluirProdutoImagens(String id) {
         Optional<ProdutoImagens> produtoImagensOpcional = produtoImagensRepository.findById(id);
         produtoImagensOpcional.ifPresent(p -> produtoImagensRepository.delete(p));
     }
