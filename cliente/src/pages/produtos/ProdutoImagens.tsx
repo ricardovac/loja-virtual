@@ -3,6 +3,8 @@ import { useEffect, useState } from "react";
 import {
     Box,
     Button,
+    CircularProgress,
+    Grid,
     IconButton,
     ImageList,
     ImageListItem,
@@ -26,11 +28,14 @@ interface Imagem {
 const ProdutoImagens = () => {
     const [imagem, setImagem] = useState<Imagem[]>([]);
     const [produto, setProduto] = useState<any>({});
+    const [isLoading, setIsLoading] = useState(true);
+    const [isUploading, setIsUploading] = useState(false);
     const produtoService = new ProdutoService();
     const produtoImagensService = new ProdutoImagemService();
     const { id } = useParams();
 
     useEffect(() => {
+        setIsLoading(true);
         const fetchData = async () => {
             const res = await produtoService.findById(id);
             setProduto(res.data);
@@ -39,28 +44,34 @@ const ProdutoImagens = () => {
     }, [id]);
 
     useEffect(() => {
+        setIsLoading(true);
+        // Busca a imagem apartir do Id do produto
         const fetchData = async () => {
-            // Busca a imagem apartir do Id do produto
-            if (produto.id) {
-                const res = await produtoImagensService.buscandoImagem(
-                    produto.id
-                );
+            if (!isUploading && produto.id) {
+                const res = await produtoImagensService
+                    .buscandoImagem(produto.id)
+                    .finally(() => setIsLoading(false));
                 setImagem(res.data);
             }
         };
         fetchData();
-    }, [produto]);
+    }, [produto, isUploading]);
 
-    const uploadImagens = async (
+    const handleUploadImagens = async (
         event: React.ChangeEvent<HTMLInputElement>
     ) => {
         try {
-            if (event.target.files) {
-                await produtoImagensService.upload({
-                    file: event.target.files[0],
-                    idProduto: produto.id,
-                });
+            setIsUploading(true);
+            let files = event.target.files;
+            if (files) {
+                for (let i = 0; i < files.length; i++) {
+                    await produtoImagensService.upload({
+                        file: files[i],
+                        idProduto: produto.id,
+                    });
+                }
             }
+            setIsUploading(false);
             event.stopPropagation();
         } catch (error) {
             console.log(error);
@@ -99,76 +110,81 @@ const ProdutoImagens = () => {
                         margin: "20px",
                     }}
                 >
-                    <Button variant="contained" component="label">
+                    <Button
+                        variant="contained"
+                        component="label"
+                        disabled={isLoading}
+                    >
                         Selecione imagens
                         <input
                             type="file"
                             hidden
-                            onChange={(e) => uploadImagens(e)}
+                            onChange={(e) => handleUploadImagens(e)}
                             accept="image/*"
+                            multiple
                         />
                     </Button>
                     Imagens: <strong>{produto.nome}</strong>
                 </Box>
-                <Box
-                    sx={{
-                        gap: "2rem",
-                    }}
-                >
-                    {imagem.length === 0 && <div></div>}
-                    <ImageList
-                        cols={3}
+                {isLoading ? (
+                    <Grid
+                        container
+                        spacing={0}
+                        direction="column"
+                        alignItems="center"
+                        justifyContent="center"
+                        style={{ minHeight: "60vh" }}
+                    >
+                        <Grid item xs={3}>
+                            <CircularProgress />
+                        </Grid>
+                    </Grid>
+                ) : (
+                    <Box
                         sx={{
-                            margin: "20px",
-                            gridTemplateColumns:
-                                "repeat(auto-fill, minmax(150px, 1fr))!important",
+                            gap: "2rem",
                         }}
                     >
-                        {imagem.map((r, index) => (
-                            <ImageListItem
-                                key={index}
-                                sx={{ height: "100% !important" }}
-                            >
-                                <img
-                                    src={`data:image/png;base64,${r.imagem}`}
-                                    loading="lazy"
-                                    alt={"Imagem não encontrada"}
-                                    style={{ width: 150, height: 150 }}
-                                />
-                                <IconButton
-                                    sx={{
-                                        color: "white",
-                                        position: "absolute",
-                                    }}
-                                    onClick={() => handleDeletarImagem(r.id)}
+                        {imagem.length === 0 && <div></div>}
+                        <ImageList
+                            cols={3}
+                            sx={{
+                                margin: "20px",
+                                gridTemplateColumns:
+                                    "repeat(auto-fill, minmax(150px, 1fr))!important",
+                            }}
+                        >
+                            {imagem.map((r, index) => (
+                                <ImageListItem
+                                    key={index}
+                                    sx={{ height: "100% !important" }}
                                 >
-                                    <Close />
-                                </IconButton>
-                            </ImageListItem>
-                        ))}
-                    </ImageList>
-                    {/* {imagem.length > 0 && (
-                        <Box>
-                            <Typography
-                                gutterBottom
-                                variant="h5"
-                                component="div"
-                            >
-                                {produto.nome}{" "}
-                            </Typography>
-                            <Typography variant="body2" color="text.secondary">
-                                Descrição: {produto.descricao}
-                            </Typography>
-                            <Typography
-                                gutterBottom
-                                variant="h6"
-                                component="div"
-                            >
-                                R${produto.valor_venda}
-                            </Typography>
-                        </Box>
-                    )} */}
-                </Box>
+                                    <img
+                                        src={`data:image/png;base64,${r.imagem}`}
+                                        loading="lazy"
+                                        alt={"Imagem não encontrada"}
+                                        style={{
+                                            width: 150,
+                                            height: 150,
+                                            borderRadius: "8px",
+                                        }}
+                                    />
+                                    <IconButton
+                                        sx={{
+                                            color: "white",
+                                            position: "absolute",
+                                        }}
+                                        onClick={() =>
+                                            handleDeletarImagem(r.id)
+                                        }
+                                    >
+                                        <Close />
+                                    </IconButton>
+                                </ImageListItem>
+                            ))}
+                        </ImageList>
+                    </Box>
+                )}
             </Box>
         </>
     );
