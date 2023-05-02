@@ -1,12 +1,12 @@
 package com.ricardo.backend.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import org.hibernate.Hibernate;
-import org.hibernate.annotations.GenericGenerator;
 
 import java.util.Date;
 import java.util.Objects;
@@ -15,12 +15,12 @@ import java.util.Objects;
 @Getter
 @Setter
 @ToString
+@AllArgsConstructor
 @RequiredArgsConstructor
 public class ProdutoImagens {
     @Id
-    @GeneratedValue(generator = "uuid")
-    @GenericGenerator(name = "uuid", strategy = "uuid2")
-    private String id;
+    @GeneratedValue
+    private Long id;
 
     private String nome;
 
@@ -32,7 +32,7 @@ public class ProdutoImagens {
 
     @Lob
     @Column(length = 100000)
-    private byte[] arquivo;
+    private byte[] imagem;
 
     @Temporal(TemporalType.TIMESTAMP)
     private Date dataCriacao;

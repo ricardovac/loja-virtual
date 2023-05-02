@@ -3,57 +3,77 @@ import { useEffect, useState } from "react";
 import {
     Box,
     Button,
-    CircularProgress,
     IconButton,
     ImageList,
     ImageListItem,
-    ImageListItemBar,
 } from "@mui/material";
 import Toolbar from "@mui/material/Toolbar";
 import { ProdutoImagemService } from "../../services/ProdutoImagemService";
-import { ProdutoService } from "../../services/ProdutoService";
+import { Produto, ProdutoService } from "../../services/ProdutoService";
 import { useParams } from "react-router-dom";
-import Typography from "@mui/material/Typography";
 import { Close } from "@mui/icons-material";
 
+interface Imagem {
+    dataAtualizacao: string;
+    dataCriacao: string;
+    id: number;
+    imagem: any;
+    nome: string;
+    produto: Produto;
+    tipo: string;
+}
+
 const ProdutoImagens = () => {
-    const [imagem, setImagem] = useState<any>(null);
+    const [imagem, setImagem] = useState<Imagem[]>([]);
     const [produto, setProduto] = useState<any>({});
-    const [isLoading, setIsLoading] = useState(true);
-    const [isRefetching, setIsRefetching] = useState(true);
-
-    const produtoImagensService = new ProdutoImagemService();
     const produtoService = new ProdutoService();
-    let params = useParams();
-
-    const fetchData = () => {
-        setIsLoading(true);
-        setIsRefetching(true);
-        try {
-            produtoService.findById(params.id).then((result) => {
-                setProduto(result.data);
-            });
-        } catch (e) {
-            console.error(e);
-            return;
-        }
-        setIsLoading(false);
-        setIsRefetching(false);
-    };
+    const produtoImagensService = new ProdutoImagemService();
+    const { id } = useParams();
 
     useEffect(() => {
+        const fetchData = async () => {
+            const res = await produtoService.findById(id);
+            setProduto(res.data);
+        };
         fetchData();
-    }, []);
+    }, [id]);
 
-    const uploadImagens = (event: React.ChangeEvent<HTMLInputElement>) => {
-        if (event.target.files) {
-            produtoImagensService
-                .upload({ file: event.target.files[0], idProduto: produto.id })
-                .then((data) => {
-                    setImagem(null);
+    useEffect(() => {
+        const fetchData = async () => {
+            // Busca a imagem apartir do Id do produto
+            if (produto.id) {
+                const res = await produtoImagensService.buscandoImagem(
+                    produto.id
+                );
+                setImagem(res.data);
+            }
+        };
+        fetchData();
+    }, [produto]);
+
+    const uploadImagens = async (
+        event: React.ChangeEvent<HTMLInputElement>
+    ) => {
+        try {
+            if (event.target.files) {
+                await produtoImagensService.upload({
+                    file: event.target.files[0],
+                    idProduto: produto.id,
                 });
+            }
+            event.stopPropagation();
+        } catch (error) {
+            console.log(error);
         }
-        event.stopPropagation();
+    };
+
+    const handleDeletarImagem = async (imagemId: number) => {
+        if (!confirm(`Are you sure you want to delete it?`)) {
+            return;
+        }
+        await produtoImagensService.deleteProduto(imagemId);
+        const imagensAtualizadas = imagem.filter((img) => img.id !== imagemId);
+        setImagem(imagensAtualizadas);
     };
 
     return (
@@ -75,12 +95,10 @@ const ProdutoImagens = () => {
                     sx={{
                         display: "flex",
                         gap: "2rem",
-                        justifyContent: "space-between",
                         alignItems: "center",
                         margin: "20px",
                     }}
                 >
-                    <Typography fontSize={18}>{produto.nome}</Typography>
                     <Button variant="contained" component="label">
                         Selecione imagens
                         <input
@@ -90,28 +108,67 @@ const ProdutoImagens = () => {
                             accept="image/*"
                         />
                     </Button>
+                    Imagens: <strong>{produto.nome}</strong>
                 </Box>
-                <ImageList
-                    sx={{ width: 500, height: 450, margin: "20px" }}
-                    cols={3}
-                    rowHeight={164}
+                <Box
+                    sx={{
+                        gap: "2rem",
+                    }}
                 >
-                    <ImageListItem>
-                        <img
-                            src={`data:image/png;base64,${produto.arquivo}`}
-                            loading="lazy"
-                            alt={""}
-                        />
-                        <IconButton
-                            sx={{
-                                color: "white",
-                                position: "absolute",
-                            }}
-                        >
-                            <Close />
-                        </IconButton>
-                    </ImageListItem>
-                </ImageList>
+                    {imagem.length === 0 && <div></div>}
+                    <ImageList
+                        cols={3}
+                        sx={{
+                            margin: "20px",
+                            gridTemplateColumns:
+                                "repeat(auto-fill, minmax(150px, 1fr))!important",
+                        }}
+                    >
+                        {imagem.map((r, index) => (
+                            <ImageListItem
+                                key={index}
+                                sx={{ height: "100% !important" }}
+                            >
+                                <img
+                                    src={`data:image/png;base64,${r.imagem}`}
+                                    loading="lazy"
+                                    alt={"Imagem não encontrada"}
+                                    style={{ width: 150, height: 150 }}
+                                />
+                                <IconButton
+                                    sx={{
+                                        color: "white",
+                                        position: "absolute",
+                                    }}
+                                    onClick={() => handleDeletarImagem(r.id)}
+                                >
+                                    <Close />
+                                </IconButton>
+                            </ImageListItem>
+                        ))}
+                    </ImageList>
+                    {/* {imagem.length > 0 && (
+                        <Box>
+                            <Typography
+                                gutterBottom
+                                variant="h5"
+                                component="div"
+                            >
+                                {produto.nome}{" "}
+                            </Typography>
+                            <Typography variant="body2" color="text.secondary">
+                                Descrição: {produto.descricao}
+                            </Typography>
+                            <Typography
+                                gutterBottom
+                                variant="h6"
+                                component="div"
+                            >
+                                R${produto.valor_venda}
+                            </Typography>
+                        </Box>
+                    )} */}
+                </Box>
             </Box>
         </>
     );

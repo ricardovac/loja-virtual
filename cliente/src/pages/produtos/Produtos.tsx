@@ -71,6 +71,7 @@ const Produtos = () => {
     useEffect(() => {
         fetchData();
     }, []);
+
     const handleCriarProduto = async (values: Produto) => {
         try {
             const response = await produtoService.create(values);
@@ -387,7 +388,7 @@ export const ModalCriarProduto = ({
                     >
                         {columns.map((column) =>
                             column.accessorKey === "categoria.nome" ? (
-                                <FormControl fullWidth>
+                                <FormControl fullWidth key={column.accessorKey}>
                                     <InputLabel id="categoriaLabel">
                                         Categoria
                                     </InputLabel>
@@ -413,7 +414,7 @@ export const ModalCriarProduto = ({
                                     </Select>
                                 </FormControl>
                             ) : column.accessorKey === "marca.nome" ? (
-                                <FormControl fullWidth>
+                                <FormControl fullWidth key={column.accessorKey}>
                                     <InputLabel id="marcaLabel">
                                         Marca
                                     </InputLabel>

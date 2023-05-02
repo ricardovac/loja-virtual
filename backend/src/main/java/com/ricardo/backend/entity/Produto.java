@@ -31,10 +31,6 @@ public class Produto {
     @Temporal(TemporalType.TIMESTAMP)
     private Date dataAtualizacao;
 
-    @Lob
-    @Column(length = 100000)
-    private byte[] arquivo;
-
     // Uma marca pode ter muitos produtos
     @ManyToOne
     @JoinColumn(name = "idMarca")
