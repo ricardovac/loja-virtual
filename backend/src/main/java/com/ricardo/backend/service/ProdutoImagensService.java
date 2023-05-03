@@ -7,7 +7,6 @@ import com.ricardo.backend.repository.ProdutoRepository;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.FileInputStream;
@@ -51,9 +50,9 @@ public class ProdutoImagensService {
     public ProdutoImagens inserirProdutoImagens(Long idProduto, MultipartFile file) throws IOException {
         // Acha o produto por Id.
         Produto produto = produtoRepository.findById(idProduto).orElse(null);
-        // Coloca o nome
         ProdutoImagens objeto = new ProdutoImagens();
 
+        // Escreve a imagem no diretorio.
         try {
             if (!file.isEmpty()) {
                 byte[] bytes = file.getBytes();
@@ -67,13 +66,23 @@ public class ProdutoImagensService {
             e.printStackTrace();
         }
 
+        // Salva o produto, nome da imagem e o tipo.
+        // Evitando arquivos no banco.
         objeto.setProduto(produto);
         objeto.setDataCriacao(new Date());
         return produtoImagensRepository.saveAndFlush(objeto);
     }
 
     public void excluirProdutoImagens(Long id) {
+        ProdutoImagens p = produtoImagensRepository.findById(id).get();
+        // Deleta a imagem do diretorio.
+        try {
+            Path caminho = Paths.get(imagePath, p.getNome());
+            Files.delete(caminho);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         Optional<ProdutoImagens> produtoImagensOpcional = produtoImagensRepository.findById(id);
-        produtoImagensOpcional.ifPresent(p -> produtoImagensRepository.delete(p));
+        produtoImagensOpcional.ifPresent(pr -> produtoImagensRepository.delete(p));
     }
 }

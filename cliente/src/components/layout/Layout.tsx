@@ -16,6 +16,7 @@ import {
     secondaryListItems,
 } from "../../pages/dashboard/listItems";
 import { Brightness4, Brightness7 } from "@mui/icons-material";
+import { Link } from "@mui/material";
 
 const drawerWidth: number = 240;
 
@@ -94,15 +95,23 @@ const Layout = ({ children }: any) => {
                     >
                         <MenuIcon />
                     </IconButton>
-                    <Typography
-                        component="h1"
-                        variant="h6"
-                        color="inherit"
-                        noWrap
-                        sx={{ flexGrow: 1 }}
+                    <Link
+                        href="/produtos"
+                        underline={"none"}
+                        color={(theme) =>
+                            theme.palette.mode === "light" ? "black" : "white"
+                        }
                     >
-                        Loja Virtual
-                    </Typography>
+                        <Typography
+                            component="h1"
+                            variant="h6"
+                            color="inherit"
+                            noWrap
+                            sx={{ flexGrow: 1, cursor: "pointer" }}
+                        >
+                            Loja Virtual
+                        </Typography>
+                    </Link>
                 </Toolbar>
             </AppBar>
             <Drawer variant="permanent" open={open}>
