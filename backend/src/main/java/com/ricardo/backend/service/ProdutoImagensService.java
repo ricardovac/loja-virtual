@@ -4,11 +4,14 @@ import com.ricardo.backend.entity.Produto;
 import com.ricardo.backend.entity.ProdutoImagens;
 import com.ricardo.backend.repository.ProdutoImagensRepository;
 import com.ricardo.backend.repository.ProdutoRepository;
+import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -18,6 +21,7 @@ import java.util.Optional;
 
 @Service
 public class ProdutoImagensService {
+    private final String imagePath = "backend/src/main/resources/static/img/";
     @Autowired
     private ProdutoImagensRepository produtoImagensRepository;
     @Autowired
@@ -27,45 +31,58 @@ public class ProdutoImagensService {
         return produtoImagensRepository.findAll();
     }
 
-    public ProdutoImagens inserirProdutoImagens(Long id, MultipartFile file) {
-        Produto produto = null;
-        if (produtoRepository.findById(id).isPresent()) {
-            produto = produtoRepository.findById(id).get();
-        }
-        ProdutoImagens imagem = new ProdutoImagens();
+    // Inserindo a imagem apartir do diretorio.
+    public List<ProdutoImagens> buscarPorProduto(Long idProduto) {
+        List<ProdutoImagens> listaProdutoImagens = produtoImagensRepository.findByProdutoId(idProduto);
 
+        for (ProdutoImagens produtoImagens : listaProdutoImagens) {
+            try (InputStream in = new FileInputStream(imagePath + produtoImagens.getNome())) {
+                produtoImagens.setImagem(IOUtils.toByteArray(in));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return listaProdutoImagens;
+    }
+
+    // Inserindo imagem no resources e seu nome, tipo no construtor.
+    public ProdutoImagens inserirProdutoImagens(Long idProduto, MultipartFile file) throws IOException {
+        // Acha o produto por Id.
+        Produto produto = produtoRepository.findById(idProduto).orElse(null);
+        ProdutoImagens objeto = new ProdutoImagens();
+
+        // Escreve a imagem no diretorio.
         try {
             if (!file.isEmpty()) {
                 byte[] bytes = file.getBytes();
-                assert produto != null;
-                String nomeDaImagem = String.valueOf(produto.getId()) + file.getOriginalFilename();
-                Path path = Paths.get("src/main/resources/static/imagens/" + nomeDaImagem);
-                Files.write(path, bytes); // Escreve a imagem.
-                imagem.setNome(nomeDaImagem);
+                String nomeImagem = produto.getId() + file.getOriginalFilename();
+                Path caminho = Paths.get(imagePath + nomeImagem);
+                Files.write(caminho, bytes);
+                objeto.setNome(nomeImagem);
+                objeto.setTipo(file.getContentType());
             }
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
         }
 
-        imagem.setProduto(produto);
-        imagem.setDataCriacao(new Date());
-        imagem = produtoImagensRepository.saveAndFlush(imagem);
-        return imagem;
-    }
-
-    public ProdutoImagens alterarProdutoImagens(ProdutoImagens produtoImagens) {
-        Optional<ProdutoImagens> produtoImagensExistente = produtoImagensRepository.findById(produtoImagens.getId());
-        if (produtoImagensExistente.isPresent()) {
-            produtoImagens.setDataCriacao(produtoImagensExistente.get().getDataCriacao()); // Mantém a data de criação existente
-        } else {
-            produtoImagens.setDataCriacao(new Date()); // Define uma nova data de criação
-        }
-        produtoImagens.setDataAtualizacao(new Date()); // Define a nova data de atualização
-        return produtoImagensRepository.saveAndFlush(produtoImagens);
+        // Salva o produto, nome da imagem e o tipo.
+        // Evitando arquivos no banco.
+        objeto.setProduto(produto);
+        objeto.setDataCriacao(new Date());
+        return produtoImagensRepository.saveAndFlush(objeto);
     }
 
     public void excluirProdutoImagens(Long id) {
+        ProdutoImagens p = produtoImagensRepository.findById(id).get();
+        // Deleta a imagem do diretorio.
+        try {
+            Path caminho = Paths.get(imagePath, p.getNome());
+            Files.delete(caminho);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         Optional<ProdutoImagens> produtoImagensOpcional = produtoImagensRepository.findById(id);
-        produtoImagensOpcional.ifPresent(p -> produtoImagensRepository.delete(p));
+        produtoImagensOpcional.ifPresent(pr -> produtoImagensRepository.delete(p));
     }
 }

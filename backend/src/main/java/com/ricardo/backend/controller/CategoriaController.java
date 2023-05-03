@@ -15,21 +15,25 @@ public class CategoriaController {
     private CategoriaService categoriaService;
 
     @GetMapping("/")
+    @CrossOrigin("http://localhost:3000")
     public List<Categoria> listarTodos() {
         return categoriaService.listarTodosCategoria();
     }
 
     @PostMapping("/")
-    public Categoria inserir(Categoria categoria) {
+    @CrossOrigin("http://localhost:3000")
+    public Categoria inserir(@RequestBody Categoria categoria) {
         return categoriaService.inserirCategoria(categoria);
     }
 
     @PutMapping("/")
-    public Categoria alterar(Categoria categoria) {
+    @CrossOrigin("http://localhost:3000")
+    public Categoria alterar(@RequestBody Categoria categoria) {
         return categoriaService.alterarCategoria(categoria);
     }
 
     @DeleteMapping("/{id}")
+    @CrossOrigin("http://localhost:3000")
     public ResponseEntity<Void> excluir(@PathVariable Long id) {
         categoriaService.excluirCategoria(id);
         return ResponseEntity.ok().build();

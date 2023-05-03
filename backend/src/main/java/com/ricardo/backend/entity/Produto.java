@@ -1,7 +1,10 @@
 package com.ricardo.backend.entity;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 import org.hibernate.Hibernate;
 
 import java.util.Date;
@@ -15,13 +18,12 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class Produto {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String descricaoCurta;
-    private String descricaoDetalhada;
-    private Double valorCusto;
-    private Double valorVenda;
+    private String nome;
+    private String descricao;
+    private Double valor_venda;
 
     @Temporal(TemporalType.TIMESTAMP)
     private Date dataCriacao;
@@ -40,8 +42,10 @@ public class Produto {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
+        if (this == o)
+            return true;
+        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o))
+            return false;
         Produto produto = (Produto) o;
         return getId() != null && Objects.equals(getId(), produto.getId());
     }

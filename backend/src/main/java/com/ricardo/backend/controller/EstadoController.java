@@ -10,6 +10,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/estado")
+@CrossOrigin("http://localhost:3000")
 public class EstadoController {
     @Autowired
     private EstadoService estadoService;
@@ -20,12 +21,12 @@ public class EstadoController {
     }
 
     @PostMapping("/")
-    public Estado inserir(Estado estado) {
+    public Estado inserir(@RequestBody Estado estado) {
         return estadoService.inserirEstado(estado);
     }
 
     @PutMapping("/")
-    public Estado alterar(Estado estado) {
+    public Estado alterar(@RequestBody Estado estado) {
         return estadoService.alterarEstado(estado);
     }
 

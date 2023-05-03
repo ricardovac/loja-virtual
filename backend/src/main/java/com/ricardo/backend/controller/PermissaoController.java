@@ -10,6 +10,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/permissao")
+@CrossOrigin("http://localhost:3000")
 public class PermissaoController {
     @Autowired
     private PermissaoService permissaoService;

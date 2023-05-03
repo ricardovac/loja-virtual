@@ -1,6 +1,7 @@
 package com.ricardo.backend.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -14,10 +15,11 @@ import java.util.Objects;
 @Getter
 @Setter
 @ToString
+@AllArgsConstructor
 @RequiredArgsConstructor
 public class ProdutoImagens {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue
     private Long id;
 
     private String nome;
@@ -25,6 +27,12 @@ public class ProdutoImagens {
     @ManyToOne
     @JoinColumn(name = "idProduto") // Alterar o nome da coluna
     private Produto produto;
+
+    private String tipo;
+
+    @Lob
+    @Column(length = 100000)
+    private byte[] imagem;
 
     @Temporal(TemporalType.TIMESTAMP)
     private Date dataCriacao;
@@ -34,8 +42,10 @@ public class ProdutoImagens {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
+        if (this == o)
+            return true;
+        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o))
+            return false;
         ProdutoImagens that = (ProdutoImagens) o;
         return getId() != null && Objects.equals(getId(), that.getId());
     }
