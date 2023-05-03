@@ -86,7 +86,6 @@ const ProdutoImagens = () => {
         const imagensAtualizadas = imagem.filter((img) => img.id !== imagemId);
         setImagem(imagensAtualizadas);
     };
-    console.log(imagem);
 
     return (
         <>

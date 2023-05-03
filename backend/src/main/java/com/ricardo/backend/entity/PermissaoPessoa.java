@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import org.hibernate.Hibernate;
+import org.springframework.security.core.GrantedAuthority;
 
 import java.util.Date;
 import java.util.Objects;
@@ -17,7 +18,7 @@ import java.util.Objects;
 @Setter
 @ToString
 @RequiredArgsConstructor
-public class PermissaoPessoa {
+public class PermissaoPessoa implements GrantedAuthority {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
@@ -39,8 +40,10 @@ public class PermissaoPessoa {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
+        if (this == o)
+            return true;
+        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o))
+            return false;
         PermissaoPessoa that = (PermissaoPessoa) o;
         return getId() != null && Objects.equals(getId(), that.getId());
     }
@@ -48,5 +51,10 @@ public class PermissaoPessoa {
     @Override
     public int hashCode() {
         return getClass().hashCode();
+    }
+
+    @Override
+    public String getAuthority() {
+        return permissao.getNome();
     }
 }
