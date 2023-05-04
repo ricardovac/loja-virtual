@@ -23,13 +23,10 @@ public class PessoaClienteService {
     public Pessoa registrar(PessoaClienteRequestDTO pessoaClienteRequestDTO) throws MessagingException {
         Pessoa pessoa = new PessoaClienteRequestDTO().converter(pessoaClienteRequestDTO);
         pessoa.setDataCriacao(new Date());
-        Pessoa pessoaNova = pessoaClienteRepository.saveAndFlush(pessoa);
-        permissaoPessoaService.vincularPessoaPermissaoCliente(pessoaNova);
-        emailService.enviarEmailComAnexo(
-                pessoaNova.getEmail(),
-                "Cadastro na Loja virtual",
-                "O registro na loja foi efetuado com sucesso. " +
-                        "Em breve você receberá a senha de acesso por e-mail.");
-        return pessoaNova;
+        Pessoa objetoNovo = pessoaClienteRepository.saveAndFlush(pessoa);
+        permissaoPessoaService.vincularPessoaPermissaoCliente(objetoNovo);
+        emailService.enviarEmailTexto(objetoNovo.getEmail(), objetoNovo.getNome(),
+                "O registro na loja foi realizado com sucesso. Em breve você receberá a senha de acesso por e-mail!!");
+        return objetoNovo;
     }
 }

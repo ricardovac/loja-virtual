@@ -4,6 +4,7 @@ import java.util.Date;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import com.ricardo.backend.entity.Pessoa;
@@ -17,7 +18,8 @@ import jakarta.servlet.http.HttpServletRequest;
 
 @Component
 public class JwtUtil {
-    private String chaveSecreta = "chaveSecretaParaGerarToken";
+    @Value("${jwt.secret}")
+    private String chaveSecreta;
     private int validadeToken = 900000;
     private static final Logger logger = LoggerFactory.getLogger(JwtUtil.class);
 
@@ -28,7 +30,8 @@ public class JwtUtil {
     }
 
     public String getEmailToken(String token) {
-        return Jwts.parser().setSigningKey(chaveSecreta).parseClaimsJws(token).getBody().getSubject();
+        return Jwts.parser().setSigningKey(chaveSecreta).parseClaimsJws(token).getBody().getSubject(); // Subject =
+                                                                                                       // email
     }
 
     public boolean validarToken(String token, HttpServletRequest request) {
@@ -42,7 +45,6 @@ public class JwtUtil {
             request.setAttribute("validacaoToken", "Token expirado");
         } catch (UnsupportedJwtException e) {
             logger.error("Token não suportado", e.getMessage());
-
         }
         return false;
     }

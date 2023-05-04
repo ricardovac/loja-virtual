@@ -36,7 +36,8 @@ public class Pessoa implements UserDetails {
     @JoinColumn(name = "idCidade")
     private Cidade cidade;
 
-    @OneToMany(mappedBy = "pessoa", orphanRemoval = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE })
+    @OneToMany(mappedBy = "pessoa", orphanRemoval = true, cascade = { CascadeType.PERSIST,
+            CascadeType.MERGE }, fetch = FetchType.EAGER)
     @Setter(value = AccessLevel.NONE)
     @ToString.Exclude
     private List<PermissaoPessoa> permissaoPessoas;
