@@ -46,7 +46,7 @@ public class PessoaGerenciamentoService {
         if (pessoaBanco != null) {
             Date diferenca = new Date(new Date().getTime() - pessoaBanco.getDataEnvioCodigo().getTime());
             if (diferenca.getTime() / 1000 < 90) {
-                pessoaBanco.setSenha(passwordEncoder.encode(pessoaBanco.getSenha()));
+                pessoaBanco.setSenha(passwordEncoder.encode(pessoa.getSenha()));
                 pessoaBanco.setCodigoRecuperacaoSenha(null);
                 pessoaRepository.saveAndFlush(pessoaBanco);
                 return "Senha alterada com sucesso";
