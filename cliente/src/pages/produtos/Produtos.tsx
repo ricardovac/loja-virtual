@@ -291,11 +291,7 @@ const Produtos = () => {
                                 </IconButton>
                             </Tooltip>
                             <Tooltip arrow placement="right" title="Imagem">
-                                <Link
-                                    href={`/produtoImagens/${row.getValue(
-                                        "id"
-                                    )}`}
-                                >
+                                <Link href={`/imagens/${row.getValue("id")}`}>
                                     <IconButton color="info">
                                         <Image />
                                     </IconButton>
