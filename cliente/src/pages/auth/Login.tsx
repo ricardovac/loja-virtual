@@ -12,34 +12,38 @@ import Box from "@mui/material/Box";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
-import { createTheme, ThemeProvider } from "@mui/material/styles";
-import { useNavigate } from "react-router-dom";
-
-const theme = createTheme();
+import { ThemeProvider } from "@mui/material/styles";
+import { CircularProgress } from "@mui/material";
+import theme from "../../theme";
+import { blue } from "@mui/material/colors";
+import { LoginService } from "../../services/util/LoginService";
 
 export default function Login() {
-    const [isLoading, setIsLoading] = useState(false);
-    const navigate = useNavigate();
+    const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [isError, setIsError] = useState<boolean>(false);
+    const [errorMessage, setErrorMessage] = useState("");
+    const loginService = new LoginService();
+
+    const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+        setIsLoading(true);
+        event.preventDefault();
+        const data = new FormData(event.currentTarget);
+        const email = data.get("email") as string;
+        const password = data.get("password") as string;
+
+        try {
+            await loginService.login(email, password);
+        } catch (error: any) {
+            setErrorMessage(error.response.data);
+            setIsError(true);
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
     useEffect(() => {
-        if (!isLoading && localStorage.getItem("token") !== null) {
-            navigate("/");
-        }
-    }, [isLoading, navigate]);
-
-    const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-        setIsLoading(true);
-        setTimeout(() => {
-            localStorage.setItem("token", "token");
-            setIsLoading(false);
-        }, 2000);
-        const data = new FormData(event.currentTarget);
-        console.log({
-            email: data.get("email"),
-            password: data.get("password"),
-        });
-        event.preventDefault();
-    };
+        document.body.style.cursor = isLoading ? "wait" : "default";
+    }, [isLoading]);
 
     return (
         <ThemeProvider theme={theme}>
@@ -51,13 +55,15 @@ export default function Login() {
                         display: "flex",
                         flexDirection: "column",
                         alignItems: "center",
+                        justifyContent: "center",
+                        minHeight: "75vh",
                     }}
                 >
-                    <Avatar sx={{ m: 1, bgcolor: "secondary.main" }}>
+                    <Avatar sx={{ m: 1, bgcolor: "primary.main" }}>
                         <LockOutlinedIcon />
                     </Avatar>
                     <Typography component="h1" variant="h5">
-                        Sign in
+                        Já tem uma conta?
                     </Typography>
                     <Box
                         component="form"
@@ -70,44 +76,61 @@ export default function Login() {
                             required
                             fullWidth
                             id="email"
-                            label="Email Address"
+                            label="Email"
                             name="email"
-                            autoComplete="email"
                             autoFocus
+                            error={isError}
                         />
                         <TextField
                             margin="normal"
                             required
                             fullWidth
                             name="password"
-                            label="Password"
+                            label="Senha"
                             type="password"
                             id="password"
-                            autoComplete="current-password"
+                            error={isError}
+                            helperText={errorMessage}
                         />
                         <FormControlLabel
                             control={
                                 <Checkbox value="remember" color="primary" />
                             }
-                            label="Remember me"
+                            label="Lembrar meus dados"
                         />
-                        <Button
-                            type="submit"
-                            fullWidth
-                            variant="contained"
-                            sx={{ mt: 3, mb: 2 }}
-                        >
-                            Sign In
-                        </Button>
+                        <Box sx={{ m: 1, position: "relative" }}>
+                            <Button
+                                type="submit"
+                                fullWidth
+                                variant="contained"
+                                disabled={isLoading}
+                                sx={{ mt: 3, mb: 2 }}
+                            >
+                                Acessar conta
+                            </Button>
+                            {isLoading && (
+                                <CircularProgress
+                                    size={24}
+                                    sx={{
+                                        color: blue[500],
+                                        position: "absolute",
+                                        top: "50%",
+                                        left: "50%",
+                                        marginTop: "-12px",
+                                        marginLeft: "-12px",
+                                    }}
+                                />
+                            )}
+                        </Box>
                         <Grid container>
                             <Grid item xs>
                                 <Link href="#" variant="body2">
-                                    Forgot password?
+                                    Esqueci minha senha
                                 </Link>
                             </Grid>
                             <Grid item>
                                 <Link href="#" variant="body2">
-                                    {"Don't have an account? Sign Up"}
+                                    {"Não tem uma conta? Inscrever-se"}
                                 </Link>
                             </Grid>
                         </Grid>

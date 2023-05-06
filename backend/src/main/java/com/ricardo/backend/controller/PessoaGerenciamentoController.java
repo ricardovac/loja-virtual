@@ -3,8 +3,10 @@ package com.ricardo.backend.controller;
 import java.util.HashMap;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -43,15 +45,18 @@ public class PessoaGerenciamentoController {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody Pessoa pessoa) {
-        Authentication authentication = authenticationManager
-                .authenticate(new UsernamePasswordAuthenticationToken(pessoa.getEmail(), pessoa.getSenha()));
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        Pessoa autenticado = (Pessoa) authentication.getPrincipal();
-        String token = jwtUtil.gerarTokenUsername(autenticado); // Gerar token para o usuario autenticado
-        HashMap<String, Object> map = new HashMap<>();
-        map.put("token", token);
-        map.put("permissoes", autenticado.getAuthorities());
-        return ResponseEntity.ok(map);
+        try {
+            Authentication authentication = authenticationManager
+                    .authenticate(new UsernamePasswordAuthenticationToken(pessoa.getEmail(), pessoa.getSenha()));
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+            Pessoa autenticado = (Pessoa) authentication.getPrincipal();
+            String token = jwtUtil.gerarTokenUsername(autenticado); // Gerar token para o usuario autenticado
+            HashMap<String, Object> map = new HashMap<>();
+            map.put("token", token);
+            map.put("permissoes", autenticado.getAuthorities());
+            return ResponseEntity.ok(map);
+        } catch (BadCredentialsException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuário inexistente ou senha inválida");
+        }
     }
-
 }

@@ -1,15 +1,14 @@
 import axios from "axios";
+import { ServiceBase } from "./ServiceBase";
 
 export interface IProdutoImagens {
     idProduto: string;
     file: File | any;
 }
 
-export class ProdutoImagemService {
-    url = process.env.REACT_APP_URL_API;
-
-    async findAll() {
-        return axios.get(this.url + "/produtoImagens/").then((res) => res);
+export class ProdutoImagemService extends ServiceBase {
+    constructor() {
+        super("produtoImagens");
     }
 
     async upload(objeto: IProdutoImagens) {

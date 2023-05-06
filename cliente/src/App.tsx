@@ -14,6 +14,7 @@ import Estados from "./pages/cidade_estado/Estados";
 import Cidade from "./pages/cidade_estado/Cidades";
 import Login from "./pages/auth/Login";
 import ErrorPage from "./pages/auth/ErrorPage";
+import { LoginService } from "./services/util/LoginService";
 
 type Props = {
     children: any;
@@ -21,8 +22,8 @@ type Props = {
 };
 
 const PrivateRoute = ({ children, redirectTo }: Props) => {
-    const isAuthenticated = localStorage.getItem("token") !== null;
-    console.log("IsAuth: ", isAuthenticated);
+    const loginService = new LoginService();
+    const isAuthenticated = loginService.autenticado();
     return isAuthenticated ? children : <Navigate to={redirectTo} />;
 };
 

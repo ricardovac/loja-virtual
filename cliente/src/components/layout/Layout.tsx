@@ -15,9 +15,9 @@ import {
     mainListItems,
     secondaryListItems,
 } from "../../pages/dashboard/listItems";
-import { Brightness4, Brightness7 } from "@mui/icons-material";
 import { Button, Link } from "@mui/material";
-import { Navigate, Outlet, useNavigate } from "react-router-dom";
+import { Outlet, useNavigate } from "react-router-dom";
+import { LoginService } from "../../services/util/LoginService";
 
 const drawerWidth: number = 240;
 
@@ -75,9 +75,10 @@ const Layout = () => {
         setOpen(!open);
     };
     const navigate = useNavigate();
+    const loginService = new LoginService();
 
     const logout = () => {
-        localStorage.removeItem("token");
+        loginService.sair();
         navigate("/login");
     };
 
@@ -122,7 +123,7 @@ const Layout = () => {
                         </Typography>
                     </Link>
                     <Button variant="outlined" onClick={logout}>
-                        Logout
+                        Sair
                     </Button>
                 </Toolbar>
             </AppBar>

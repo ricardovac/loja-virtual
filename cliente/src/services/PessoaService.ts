@@ -1,4 +1,5 @@
 import axios from "axios";
+import { ServiceBase } from "./ServiceBase";
 
 export type Pessoa = {
     id: number;
@@ -14,22 +15,8 @@ export type Pessoa = {
     permissaoPessoas: any;
 };
 
-export class PessoaService {
-    url = process.env.REACT_APP_URL_API;
-
-    async findAll() {
-        return axios.get(this.url + "/pessoa/").then((res) => res);
-    }
-
-    async create(objeto: Pessoa) {
-        return axios.post(this.url + "/pessoa/", objeto).then((res) => res);
-    }
-
-    async edit(objeto: Pessoa) {
-        return axios.put(this.url + "/pessoa/", objeto).then((res) => res);
-    }
-
-    async delete(id: number) {
-        return axios.delete(this.url + "/pessoa/" + id);
+export class PessoaService extends ServiceBase {
+    constructor() {
+        super("pessoa");
     }
 }

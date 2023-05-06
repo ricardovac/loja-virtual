@@ -469,6 +469,7 @@ export const ModalCriarPessoa = ({
                                     <FormGroup>
                                         {todasPermissoes.map((permissoes) => (
                                             <FormControlLabel
+                                                key={permissoes.id}
                                                 control={
                                                     <Switch
                                                         onChange={

@@ -39,7 +39,7 @@ public class WebSecurityConfig {
                 .exceptionHandling().authenticationEntryPoint(authenticationHandler).and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and().authorizeHttpRequests().requestMatchers("/api/pessoa-gerenciamento/**").permitAll()
-                .requestMatchers("/api/pessoa/**").hasAnyAuthority("gerente")
+                .requestMatchers("/api/pessoa/**").hasAnyAuthority("Gerente")
                 .anyRequest().authenticated();
 
         http.addFilterBefore(authFilterToken(), UsernamePasswordAuthenticationFilter.class);
