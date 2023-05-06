@@ -1,6 +1,7 @@
 import React from "react";
 import { Box, Button, Container, Typography } from "@mui/material";
 import Grid from "@mui/material/Grid";
+import { Link } from "react-router-dom";
 
 export default function ErrorPage() {
     return (
@@ -17,9 +18,11 @@ export default function ErrorPage() {
                     <Grid xs={6}>
                         <Typography variant="h1">404</Typography>
                         <Typography variant="h6">
-                            The page you’re looking for doesn’t exist.
+                            A página que você está procurando não existe.
                         </Typography>
-                        <Button variant="contained">Back Home</Button>
+                        <Link to="/">
+                            <Button variant="contained">Voltar</Button>
+                        </Link>
                     </Grid>
                     <Grid xs={6}>
                         <img

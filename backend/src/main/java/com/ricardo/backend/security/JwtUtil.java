@@ -11,6 +11,7 @@ import com.ricardo.backend.entity.Pessoa;
 
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.SignatureException;
 import io.jsonwebtoken.UnsupportedJwtException;
@@ -20,7 +21,8 @@ import jakarta.servlet.http.HttpServletRequest;
 public class JwtUtil {
     @Value("${jwt.secret}")
     private String chaveSecreta;
-    private int validadeToken = 900000;
+    @Value("${jwt.expiration}")
+    private int validadeToken;
     private static final Logger logger = LoggerFactory.getLogger(JwtUtil.class);
 
     public String gerarTokenUsername(Pessoa pessoa) {
@@ -40,11 +42,15 @@ public class JwtUtil {
             return true;
         } catch (SignatureException e) {
             logger.error("Assinatura Inválida", e.getMessage());
+        } catch (MalformedJwtException e) {
+            logger.error("Invalid JWT token", e.getMessage());
         } catch (ExpiredJwtException e) {
             logger.error("Token expirado", e.getMessage());
             request.setAttribute("validacaoToken", "Token expirado");
         } catch (UnsupportedJwtException e) {
             logger.error("Token não suportado", e.getMessage());
+        } catch (IllegalArgumentException e) {
+            logger.error("Token não encontrado", e.getMessage());
         }
         return false;
     }
