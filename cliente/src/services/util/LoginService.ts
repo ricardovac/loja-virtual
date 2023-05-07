@@ -2,7 +2,8 @@ import axios from "axios";
 
 export class LoginService {
     url = process.env.REACT_APP_URL_API;
-    CHAVE_TOKEN = "";
+    access_token = "";
+    refresh_token = "";
     async login(email: string, senha: string) {
         const login = { email, senha };
 
@@ -11,7 +12,7 @@ export class LoginService {
                 `${this.url}/pessoa-gerenciamento/login`,
                 login
             );
-            localStorage.setItem(this.CHAVE_TOKEN, res.data.token);
+            localStorage.setItem(this.access_token, res.data.token);
             window.location.href = "/";
         } catch (error: any) {
             throw error;
@@ -23,10 +24,10 @@ export class LoginService {
     }
 
     sair() {
-        localStorage.removeItem(this.CHAVE_TOKEN);
+        localStorage.removeItem(this.access_token);
     }
 
     getToken() {
-        return localStorage.getItem(this.CHAVE_TOKEN);
+        return localStorage.getItem(this.access_token);
     }
 }

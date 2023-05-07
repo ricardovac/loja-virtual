@@ -1,5 +1,7 @@
 package com.ricardo.backend.controller;
 
+import java.io.Console;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -55,11 +57,14 @@ public class PessoaGerenciamentoController {
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody Pessoa pessoa) {
         try {
+            // Autenticando usuário.
             Authentication authentication = authenticationManager
                     .authenticate(new UsernamePasswordAuthenticationToken(pessoa.getEmail(), pessoa.getSenha()));
             SecurityContextHolder.getContext().setAuthentication(authentication);
+            // Dados do usúario autenticado.
             Pessoa autenticado = (Pessoa) authentication.getPrincipal();
             String token = jwtUtil.gerarTokenUsername(autenticado); // Gerar token para o usuario autenticado
+            // Criando um refreshToken pelo Id do usuário
             RefreshToken refreshToken = refreshTokenService.createRefreshToken(autenticado.getId());
 
             return ResponseEntity

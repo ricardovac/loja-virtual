@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios, { AxiosError, AxiosRequestConfig, AxiosResponse, InternalAxiosRequestConfig } from "axios";
 import { LoginService } from "./util/LoginService";
 
 export class ServiceBase {
@@ -7,6 +7,7 @@ export class ServiceBase {
     constructor(urlBase: string) {
         this.url = urlBase + "/";
         this.inicializarAxios();
+        this.tratamentoErro401();
     }
 
     axiosInstance = axios.create({
@@ -15,13 +16,28 @@ export class ServiceBase {
 
     inicializarAxios() {
         this.axiosInstance.interceptors.request.use(
-            (config) => {
+            (config: InternalAxiosRequestConfig) => {
                 const token = new LoginService().getToken();
                 const authRequestToken = token ? `Bearer ${token}` : "";
                 config.headers!.Authorization = authRequestToken;
                 return config;
             },
-            (error) => Promise.reject(error)
+            (error: AxiosError) => Promise.reject(error)
+        );
+    }
+
+    tratamentoErro401() {
+        this.axiosInstance.interceptors.response.use(
+            (response: AxiosResponse) => {
+                return response;
+            },
+            (error: AxiosError) => {
+                if (error.response?.status === 403) {
+                    new LoginService().sair();
+                    window.location.href = "/";
+                }
+                return Promise.reject(error);
+            }
         );
     }
 

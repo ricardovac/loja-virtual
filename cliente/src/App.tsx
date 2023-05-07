@@ -16,12 +16,7 @@ import Login from "./pages/auth/Login";
 import ErrorPage from "./pages/auth/ErrorPage";
 import { LoginService } from "./services/util/LoginService";
 
-type Props = {
-    children: any;
-    redirectTo: any;
-};
-
-const PrivateRoute = ({ children, redirectTo }: Props) => {
+const PrivateRoute = ({ children, redirectTo }: any) => {
     const loginService = new LoginService();
     const isAuthenticated = loginService.autenticado();
     return isAuthenticated ? children : <Navigate to={redirectTo} />;
