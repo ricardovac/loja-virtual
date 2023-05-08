@@ -1,10 +1,6 @@
 import * as React from "react";
 import Layout from "./components/layout/Layout";
-import {
-    createBrowserRouter,
-    Navigate,
-    RouterProvider,
-} from "react-router-dom";
+import { createBrowserRouter, Navigate, RouterProvider } from "react-router-dom";
 import Produtos from "./pages/produtos/Produtos";
 import Dashboard from "./pages/dashboard/Dashboard";
 import ProdutoImagens from "./pages/produtos/ProdutoImagens";
@@ -15,6 +11,7 @@ import Cidade from "./pages/cidade_estado/Cidades";
 import Login from "./pages/auth/Login";
 import ErrorPage from "./pages/auth/ErrorPage";
 import { LoginService } from "./services/util/LoginService";
+import Register from "./pages/auth/Register";
 
 const PrivateRoute = ({ children, redirectTo }: any) => {
     const loginService = new LoginService();
@@ -90,6 +87,10 @@ const router = createBrowserRouter([
     {
         path: "/login",
         element: <Login />,
+    },
+    {
+        path: "/registrar",
+        element: <Register />,
     },
 ]);
 

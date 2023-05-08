@@ -8,10 +8,7 @@ export class LoginService {
         const login = { email, senha };
 
         try {
-            const res = await axios.post(
-                `${this.url}/pessoa-gerenciamento/login`,
-                login
-            );
+            const res = await axios.post(`${this.url}/pessoa-gerenciamento/login`, login);
             localStorage.setItem(this.access_token, res.data.token);
             window.location.href = "/";
         } catch (error: any) {

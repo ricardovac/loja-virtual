@@ -1,4 +1,4 @@
-import axios, { AxiosError, AxiosRequestConfig, AxiosResponse, InternalAxiosRequestConfig } from "axios";
+import axios, { AxiosError, AxiosResponse, InternalAxiosRequestConfig } from "axios";
 import { LoginService } from "./util/LoginService";
 
 export class ServiceBase {
@@ -7,7 +7,7 @@ export class ServiceBase {
     constructor(urlBase: string) {
         this.url = urlBase + "/";
         this.inicializarAxios();
-        this.tratamentoErro401();
+        this.tratamentoErro403();
     }
 
     axiosInstance = axios.create({
@@ -26,7 +26,7 @@ export class ServiceBase {
         );
     }
 
-    tratamentoErro401() {
+    tratamentoErro403() {
         this.axiosInstance.interceptors.response.use(
             (response: AxiosResponse) => {
                 return response;
@@ -34,9 +34,9 @@ export class ServiceBase {
             (error: AxiosError) => {
                 if (error.response?.status === 403) {
                     new LoginService().sair();
-                    window.location.href = "/";
+                    window.location.href = "/login";
                 }
-                return Promise.reject(error);
+                return Promise.reject("Token expirado");
             }
         );
     }
