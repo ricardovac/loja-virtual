@@ -176,7 +176,7 @@ const ProdutoImagens = () => {
                   />
                   <IconButton
                     sx={{
-                      color: "white",
+                      color: "black",
                       position: "absolute",
                     }}
                     onClick={() => handleDeletarImagem(r.id)}

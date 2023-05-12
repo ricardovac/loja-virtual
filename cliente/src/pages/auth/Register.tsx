@@ -31,11 +31,20 @@ interface IValidacao {
   mensagem: string;
 }
 
+interface FormData {
+  nome: string;
+  cpf: string;
+  email: string;
+  endereco: string;
+  cep: string;
+  cidade: string;
+}
+
 export default function Register() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isError, setIsError] = useState<boolean>(false);
   const [erroValidacao, setErroValidacao] = useState<IValidacao[]>([]);
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<FormData>({
     nome: "",
     cpf: "",
     email: "",
@@ -44,6 +53,21 @@ export default function Register() {
     cidade: "",
   });
   const registrarService = new RegistrarService();
+  const [enderecoValue, setEnderecoValue] = useState("");
+  const [cidadeValue, setCidadeValue] = useState("");
+
+  const handleCEP = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const cep = e.target.value.replace(/\D/g, "");
+    await fetch(`https://viacep.com.br/ws/${cep}/json/`)
+      .then((r) => r.json())
+      .then((data) => {
+        const endereco = `${data.bairro},  ${data.logradouro}`;
+        if (data.logradouro) {
+          setEnderecoValue(endereco);
+          setCidadeValue(data.localidade);
+        }
+      });
+  };
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -107,9 +131,17 @@ export default function Register() {
                         ? "99999-999"
                         : ""
                     }
+                    onBlur={field.name === "cep" && handleCEP}
                     maskChar=" "
                     onChange={handleFormChange}
                     key={index}
+                    value={
+                      field.name === "endereco"
+                        ? enderecoValue
+                        : field.name === "cidade"
+                        ? cidadeValue
+                        : formData[field.name as keyof FormData]
+                    }
                   >
                     {() => (
                       <TextField
@@ -122,6 +154,13 @@ export default function Register() {
                         error={isError && erroValidacao?.some((erro) => erro.campo === field.name)}
                         helperText={
                           erroValidacao?.find((erro) => erro.campo === field.name)?.mensagem
+                        }
+                        value={
+                          field.name === "endereco"
+                            ? enderecoValue
+                            : field.name === "cidade"
+                            ? cidadeValue
+                            : formData[field.name as keyof FormData]
                         }
                       />
                     )}
