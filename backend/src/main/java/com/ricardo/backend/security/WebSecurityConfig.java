@@ -38,8 +38,10 @@ public class WebSecurityConfig {
         http.cors().and().csrf().disable()
                 .exceptionHandling().authenticationEntryPoint(authenticationHandler).and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and().authorizeHttpRequests().requestMatchers("/api/pessoa-gerenciamento/**").permitAll()
-                .requestMatchers("/api/pessoa/**").hasAnyAuthority("gerente")
+                .and().authorizeHttpRequests()
+                .requestMatchers("/api/pessoa-gerenciamento/**").permitAll()
+                .requestMatchers("/api/pessoa/**").hasAnyAuthority("Gerente")
+                .requestMatchers("/api/cliente/**").permitAll()
                 .anyRequest().authenticated();
 
         http.addFilterBefore(authFilterToken(), UsernamePasswordAuthenticationFilter.class);

@@ -1,5 +1,6 @@
 import axios from "axios";
 import { Estado } from "./EstadoService";
+import { ServiceBase } from "./ServiceBase";
 
 export type Cidade = {
     id: number;
@@ -7,22 +8,8 @@ export type Cidade = {
     estado: Estado;
 };
 
-export class CidadeService {
-    url = process.env.REACT_APP_URL_API;
-
-    async findAll() {
-        return axios.get(this.url + "/cidade/").then((res) => res);
-    }
-
-    async create(objeto: Cidade) {
-        return axios.post(this.url + "/cidade/", objeto).then((res) => res);
-    }
-
-    async edit(objeto: Cidade) {
-        return axios.put(this.url + "/cidade/", objeto).then((res) => res);
-    }
-
-    async delete(id: number) {
-        return axios.delete(this.url + "/cidade/" + id);
+export class CidadeService extends ServiceBase {
+    constructor() {
+        super("cidade");
     }
 }

@@ -15,8 +15,9 @@ import {
     mainListItems,
     secondaryListItems,
 } from "../../pages/dashboard/listItems";
-import { Brightness4, Brightness7 } from "@mui/icons-material";
-import { Link } from "@mui/material";
+import { Button, Link } from "@mui/material";
+import { Outlet, useNavigate } from "react-router-dom";
+import { LoginService } from "../../services/util/LoginService";
 
 const drawerWidth: number = 240;
 
@@ -68,10 +69,17 @@ const Drawer = styled(MuiDrawer, {
     },
 }));
 
-const Layout = ({ children }: any) => {
+const Layout = () => {
     const [open, setOpen] = React.useState(true);
     const toggleDrawer = () => {
         setOpen(!open);
+    };
+    const navigate = useNavigate();
+    const loginService = new LoginService();
+
+    const logout = () => {
+        loginService.sair();
+        navigate("/login");
     };
 
     return (
@@ -81,6 +89,8 @@ const Layout = ({ children }: any) => {
                 <Toolbar
                     sx={{
                         pr: "24px", // keep right padding when drawer closed
+                        display: "flex",
+                        justifyContent: "space-between",
                     }}
                 >
                     <IconButton
@@ -112,6 +122,9 @@ const Layout = ({ children }: any) => {
                             Loja Virtual
                         </Typography>
                     </Link>
+                    <Button variant="outlined" onClick={logout}>
+                        Sair
+                    </Button>
                 </Toolbar>
             </AppBar>
             <Drawer variant="permanent" open={open}>
@@ -134,7 +147,7 @@ const Layout = ({ children }: any) => {
                     {secondaryListItems}
                 </List>
             </Drawer>
-            {children}
+            <Outlet />
         </Box>
     );
 };

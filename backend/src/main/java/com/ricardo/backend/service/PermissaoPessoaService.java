@@ -20,7 +20,7 @@ public class PermissaoPessoaService {
     private PermissaoRepository permissaoRepository;
 
     public void vincularPessoaPermissaoCliente(Pessoa pessoa) {
-        List<Permissao> listaPermissao = permissaoRepository.findByNome("cliente");
+        List<Permissao> listaPermissao = permissaoRepository.findByNome("Funcionario");
         if (listaPermissao.size() > 0) {
             PermissaoPessoa permissaoPessoa = new PermissaoPessoa();
             permissaoPessoa.setPessoa(pessoa);
